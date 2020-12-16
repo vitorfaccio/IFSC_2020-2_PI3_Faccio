@@ -11,5 +11,6 @@ Primeira etapa - Alexa.
 Intenção: utilizar o notebook como o receptor dos comandos de voz, configurando-o sendo um IoT Device.  
 Como fazer o computador ser um IoT Device: https://docs.aws.amazon.com/iot/latest/developerguide/using-laptop-as-device.html  
 Como fazer um IoT Device se comunicar com a Alexa: https://amzn.to/3gwpNws ; https://amzn.to/33WFYOy ; https://amzn.to/37KSDWg ; https://amzn.to/33Yzejj  
-Esta etapa deve ser realizada após testes deste tutorial: https://aws.amazon.com/pt/blogs/robotics/build-alexa-controlled-robot/
+Esta etapa deve ser realizada após testes deste tutorial: https://aws.amazon.com/pt/blogs/robotics/build-alexa-controlled-robot/  
+Tutorial pra parte desse último: https://www.youtube.com/watch?v=28FS2qix2u4&ab_channel=ElectronicsInnovation
 
