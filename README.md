@@ -2,10 +2,10 @@
 Repositório da unidade curricular PI3 do curso de Engenharia Eletrônica. Mais detalhes em breve.
 
 - Primeira etapa: Alexa, Lambda, IoT. Fazer com que um comando de voz captado pelo microfone seja lido pela Alexa e transformado em *MQTT publish* ao *IoT Thing*.
-- Segunda etapa: RoboMaker. Designar funç~oes de movimentaç~ao do rob^o e estabelecer conex~ao com o sistema da primeira etapa.
-  - Testes da primeira e segunda etapa s~ao realizados apenas em simulaç~ao por meio de ferramentas fornecidas pelas pr'oprias plataformas de desenvolvimento.
-- Terceira etapa: Instalaç~ao do projeto em um robô f'isico e um dispositivo para recebimento de comandos de voz.
-- Quinta etapa: Aprimoramento do sistema implementado e adiç~ao de funç~oes de feedback e obtenç~ao de dados.
+- Segunda etapa: RoboMaker. Designar funçoes de movimentaçao do rob^o e estabelecer conexao com o sistema da primeira etapa.
+  - Testes da primeira e segunda etapa sao realizados apenas em simulaçao por meio de ferramentas fornecidas pelas proprias plataformas de desenvolvimento.
+- Terceira etapa: Instalaçao do projeto em um robô fisico e um dispositivo para recebimento de comandos de voz.
+- Quinta etapa: Aprimoramento do sistema implementado e adiçao de funçoes de feedback e obtençao de dados.
 
 Primeira etapa - Alexa, Lambda, IoT.  
 
