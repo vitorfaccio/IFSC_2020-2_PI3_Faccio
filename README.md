@@ -18,11 +18,18 @@ A pandemia de Covid-19 iniciada em 2020 causou a proibição de aulas presenciai
 
 Neste sentido surgiu a oportunidade de explorar a plataforma Amazon Web Services (AWS) e seu ambiente de desenvolvimento de robótica, o AWS RoboMaker, ainda pouco abordado no curso. De maneira complementar, o sistema de reconhecimento de voz Alexa e uma placa Raspberry Pi foram cogitados como bons elementos para a integração de sistemas, constituindo o _frontend_ do _software_ e o _hardware_.
 
+**Este repositório tem como função relatar os processos elaborados durante a unidade curricular mas também servir de tutorial para desenvolvedores. As etapas são descritas de forma a permitir a replicação do projeto, seguindo estratégias e _links_ disponíveis até a data de upload, abril de 2021.**
+
 ## Proposta
 
 -  Fazer o controle de um robô de forma remota, com comando por Alexa e acionamento elétrico em Raspberry Pi;
     
 -   Utilização da plataforma Amazon Web Services (AWS) para comunicação entre os dispositivos.
+
+O diagrama a seguir apresenta a arquitetura base do projeto proposto, retirada de um 
+
+![enter image description here](https://d2908q01vomqb2.cloudfront.net/a9334987ece78b6fe8bf130ef00b74847c1d3da6/2020/07/16/alexa-blog-0_1.jpg)
+Fonte: [Build an Alexa controlled robot with AWS RoboMaker](https://aws.amazon.com/pt/blogs/robotics/build-alexa-controlled-robot/)
 
 ## Componentes necessários
 
@@ -33,10 +40,3 @@ Neste sentido surgiu a oportunidade de explorar a plataforma Amazon Web Services
 	- A versão do sistema operacional é restrita devido à compatibilidade com _softwares_ utilizados na etapa de simulação.
 
 ## Bons guias iniciais
-
-Considerando 
-
-
-
-
-CONTINUA
