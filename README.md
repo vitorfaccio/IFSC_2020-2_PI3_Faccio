@@ -1,25 +1,21 @@
 # IFSC_2020-2_PI3_Faccio
-Repositório da unidade curricular PI3 do curso de Engenharia Eletrônica. Mais detalhes em breve.
 
-- Primeira etapa: Alexa, Lambda, IoT. Fazer com que um comando de voz captado pelo microfone seja lido pela Alexa e transformado em *MQTT publish* ao *IoT Thing*.
-- Segunda etapa: RoboMaker. Designar funçoes de movimentaçao do rob^o e estabelecer conexao com o sistema da primeira etapa.
-  - Testes da primeira e segunda etapa sao realizados apenas em simulaçao por meio de ferramentas fornecidas pelas proprias plataformas de desenvolvimento.
-- Terceira etapa: Instalaçao do projeto em um robô fisico e um dispositivo para recebimento de comandos de voz.
-- Quinta etapa: Aprimoramento do sistema implementado e adiçao de funçoes de feedback e obtençao de dados.
+- Instituto Federal de Santa Catarina - Câmpus Florianópolis
+- Departamento Acadêmico de Eletrônica
+- Curso de Engenharia Eletrônica
+- Unidade curricular: Projeto Integrador III (PI3)
+- Professores:
+	- Daniel Lohmann
+	- Robinson Pizzio
+- Aluno: Vítor Faccio - vitorfaccio.ifsc@gmail.com
+- Período de execução entre outubro de 2020 e abril de 2021
 
-Primeira etapa - Alexa, Lambda, IoT.  
+## Introdução
 
+Este projeto foi desenvolvido como objeto de avaliação da unidade curricular PI3, compreendendo diversas etapas abordadas ao longo do semestre letivo 2020-2 do Instituto Federal de Santa Catarina (IFSC). 
 
+A pandemia de Covid-19 iniciada em 2020 causou a proibição de aulas presenciais e o uso de laboratórios, acarretando em uma forte limitação do escopo desta atividade na questão de implementação e testes práticos. A unidade curricular PI3 tem o propósito de unir aprendizados de _software_ e _hardware_ dentro de um único projeto, porém para contornar a dependência de testes físicos complexos optou-se por um sistema mais virtual, com ênfase em comunicação e processamento em nuvem, e _hardware_ simplificado mas aberto a aprimoramentos futuros. 
 
-Como fazer o computador ser um IoT Device: https://docs.aws.amazon.com/iot/latest/developerguide/using-laptop-as-device.html  
-Como fazer um IoT Device se comunicar com a Alexa: https://amzn.to/3gwpNws ; https://amzn.to/33WFYOy ; https://amzn.to/37KSDWg ; https://amzn.to/33Yzejj  
-Esta etapa deve ser realizada após testes deste tutorial: https://aws.amazon.com/pt/blogs/robotics/build-alexa-controlled-robot/  
+Neste sentido surgiu a oportunidade de explorar a plataforma Amazon Web Services (AWS) e seu ambiente de desenvolvimento de robótica, o AWS RoboMaker, ainda pouco abordado no curso. De maneira complementar, o sistema de reconhecimento de voz Alexa e uma placa Raspberry Pi foram cogitados como bons elementos para a integração de sistemas, constituindo o _frontend_ do _software_ e o _hardware_.
 
-
-
-
-
-
-# Demais links
-Tutorial pra ESP8266 como IoT: https://www.youtube.com/watch?v=28FS2qix2u4&ab_channel=ElectronicsInnovation
-
+CONTINUA
