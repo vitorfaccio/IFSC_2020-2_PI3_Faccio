@@ -90,7 +90,7 @@ Tendo entrado no [Alexa Developer Console](https://developer.amazon.com/alexa/co
 
 1. Clique em `Criar Skill`.
 <p align="center">
-    <img width="50%" height="50%" src="imagens/imagem_00_AlexaInicio.jpg">
+    <img width="100%" height="100%" src="imagens/imagem_00_AlexaInicio.jpg">
 </p>
 
 2. Preencha as seleções da primeira página:
@@ -102,19 +102,19 @@ Tendo entrado no [Alexa Developer Console](https://developer.amazon.com/alexa/co
 	- Clique em `Create skill` no canto superior direito da tela.
 
 <p align="center">
-    <img width="50%" height="50%" src="imagens/imagem_01_CriarSkill01.jpg">
+    <img width="100%" height="100%" src="imagens/imagem_01_CriarSkill01.jpg">
 </p>
 
 3. **"Choose a template to add to your skill"**: os comandos serão escritos do zero, portanto escolha `Start from Scratch`. Clique em `Choose` e a _skill_ será criada.
 
 <p align="center">
-    <img width="50%" height="50%" src="imagens/imagem_02_CriarSkill02.jpg">
+    <img width="100%" height="100%" src="imagens/imagem_02_CriarSkill02.jpg">
 </p>
 
 Após criar a _skill_ o console fornece uma página conforme a figura a seguir.
 
 <p align="center">
-    <img width="50%" height="50%" src="imagens/imagem_03_CriarSkill03.jpg">
+    <img width="100%" height="100%" src="imagens/imagem_03_CriarSkill03.jpg">
 </p>
 
 ### Parâmetros e comandos da _skill_
@@ -122,7 +122,7 @@ Após criar a _skill_ o console fornece uma página conforme a figura a seguir.
 Sendo concluída a criação da _skill_ é necessário definir as características da comunicação entre o dispositivo Alexa e o usuário. [Este tutorial da Codecademy](https://www.codecademy.com/learn/learn-alexa/modules/learn-alexa-skills-kit) explica com proficiência estes detalhes, de onde se tira a imagem a seguir.  
 
 <p align="center">
-    <img width="50%" height="50%" src="imagens/imagem_04_ParametrosSkill01.jpg">
+    <img width="100%" height="100%" src="imagens/imagem_04_ParametrosSkill01.jpg">
 </p>
 
 A frase ilustra o que o usuário deve falar para se comunicar com o dispositivo Alexa. São destacadas as seguintes partes com seus exemplos:
@@ -135,7 +135,7 @@ A frase ilustra o que o usuário deve falar para se comunicar com o dispositivo 
 Estes dois últimos fatores devem ser configurados pelo desenvolvedor. O primeiro, nome de invocação da _skill_, pode ser alterado na aba **"Invocation"**, no lado esquerdo da tela. A figura a seguir mostra o caso, onde é visto também que o nome escolhido para chamar a _skill_ foi `robot one`.
 
 <p align="center">
-    <img width="50%" height="50%" src="imagens/imagem_05_ParametrosSkill02.jpg">
+    <img width="100%" height="100%" src="imagens/imagem_05_ParametrosSkill02.jpg">
 </p>
 
 Cada possível comando passado por Alexa recebe o nome de _"Intent"_ (intenção). Deverão ser criados todos os _intents_ a se usar com o robô, portanto é necessário listar todos os movimentos que o sistema deverá reconhecer. Considerando que o _hardware_ terá um par de motores DC, controlando os lados esquerdo e direito, é possível 
