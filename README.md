@@ -141,7 +141,7 @@ Estes dois últimos fatores devem ser configurados pelo desenvolvedor. O primeir
 Cada possível comando passado por Alexa recebe o nome de _"Intent"_ (intenção). Deverão ser criados todos os _intents_ a se usar com o robô, portanto é necessário listar todos os movimentos que o sistema deverá reconhecer. Considerando que o _hardware_ terá um par de motores DC, controlando os lados esquerdo e direito, é possível 
 
 Observa-se o congelamento do instante 463us ao 532us, onde o sinal `counter` se mantém em `69`. 
-'''C
+
 	wtd_enable();
 	
 	delay_(3);
@@ -151,7 +151,7 @@ Observa-se o congelamento do instante 463us ao 532us, onde o sinal `counter` se 
 	delay_(3);
 	
 	wtd_hold(0);
-'''
+
 
 Teste
 
