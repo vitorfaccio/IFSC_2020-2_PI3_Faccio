@@ -143,15 +143,10 @@ Cada possível comando passado por Alexa recebe o nome de _"Intent"_ (intenção
 Observa-se o congelamento do instante 463us ao 532us, onde o sinal `counter` se mantém em `69`. 
 
 	wtd_enable();
-	
 	delay_(3);
-	
 	wtd_hold(1);
-	
 	delay_(3);
-	
 	wtd_hold(0);
-
 
 Teste
 
