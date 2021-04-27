@@ -16,7 +16,7 @@ Este projeto foi desenvolvido como objeto de avaliação da unidade curricular P
 
 A pandemia de Covid-19 iniciada em 2020 causou a proibição de aulas presenciais e o uso de laboratórios, acarretando em uma forte limitação do escopo desta atividade na questão de implementação e testes práticos. A unidade curricular PI3 tem o propósito de unir aprendizados de _software_ e _hardware_ dentro de um único projeto, porém para contornar a dependência de testes físicos complexos optou-se por um sistema mais virtual, com ênfase em comunicação e processamento em nuvem, e _hardware_ simplificado -- mas aberto a aprimoramentos futuros. 
 
-Neste sentido surgiu a oportunidade de explorar a Amazon Web Services (AWS) e seu ambiente de desenvolvimento de robótica, o AWS RoboMaker, ainda pouco abordados no curso. A AWS é uma plataforma de desenvolvimento e computação em nuvem dos mais variados tipos de serviço, desde controle de frotas de robôs a instanciamento em larga escala de máquinas virtuais, ferramentas de _machine learning_ e análise de dados. Este aglomerado dá abertura a inúmeras possibilidades em empresas dentro e fora do ramo da tecnologia, visto que comunicação e automatização de processos com segurança digital são qualidades que podem afetar qualquer setor.
+Neste sentido surgiu a oportunidade de explorar o Amazon Web Services (AWS) e seu ambiente de desenvolvimento de robótica, o AWS RoboMaker, ainda pouco abordados no curso. O AWS é uma plataforma de desenvolvimento e computação em nuvem dos mais variados tipos de serviço, desde controle de frotas de robôs a instanciamento em larga escala de máquinas virtuais, ferramentas de _machine learning_ e análise de dados. Este aglomerado dá abertura a inúmeras possibilidades em empresas dentro e fora do ramo da tecnologia, visto que comunicação e automatização de processos com segurança digital são qualidades que podem afetar qualquer setor.
 
 De maneira complementar, o sistema de reconhecimento de voz Alexa e uma placa Raspberry Pi foram cogitados como bons elementos para a integração de sistemas, constituindo o _frontend_ do _software_ e o _hardware_.
 
@@ -78,7 +78,49 @@ Este pode ser o primeiro contato do leitor com robótica, Alexa e plataforma AWS
 
 # Primeira etapa
 
-A primeira etapa do projeto diz respeito aos sistemas em nuvem e simulação de _hardware_. De acordo com a imagem anterior há três estágios por trás da comunicação em nuvem: _skill_ Alexa, função Lambda e AWS IoT Topic. Estes três pontos são essencialmente interdependentes para testagem, mas cada um será descrito individualmente.
+A primeira etapa do projeto diz respeito aos sistemas em nuvem e simulação de _hardware_. De acordo com a imagem anterior há três estágios por trás da comunicação em nuvem: AWS IoT _thing_, _skill_ Alexa e função Lambda. Estes três pontos são interdependentes para testagem, mas cada um será descrito individualmente.
+
+## Criação de _thing_ em AWS IoT
+
+A conexão entre os componentes do projeto é feita pela integração de todos a um IoT _thing_. Trata-se de um receptáculo com endereço URL fixo e acessível ao desenvolvedor, que reúne e redistribui dados enviados de todas as partes. 
+
+O IoT _thing_ utiliza protocolo MQTT (_Message Queuing Telemetry Transport_) em suas mensagens. Esta estratégia é focada no envio seguro de dados pela internet com um baixo gasto de banda, ainda requerendo códigos curtos e leves por parte das máquinas. Embora não tenha havido uma pesquisa aprofundada sobre o funcionamento deste sistema, convém entendê-lo para se ter maior domínio de todas as etapas do projeto.
+
+### Comunicação MQTT
+
+Uma comunicação baseada em MQTT pode envolver diversos elementos. O primeiro e necessário é o _MQTT-Broker_, figura central na imagem a seguir. É o ponto que recebe e distribui as mensagens para seus devidos destinatários. Ao redor dele encontram-se todos os dispositivos conectados, que realizam duas tarefas elementares: **Publish** e **Subscribe**.
+
+![enter image description here](https://hlassets.paessler.com/common/files/infographics/mqtt-architecture.png)
+Fonte: [IT Explained: MQTT](https://www.paessler.com/it-explained/mqtt)
+
+As funções citadas funcionam como o envio e recebimento de mensagens, mas para que possam transitar tipos diferentes de dados especifica-se um **Tópico**. O tópico age como um título, utilizado pelos _devices_ para especificar o que deve ser resgatado do _Broker_.
+
+A função _Publish_ é utilizada quando um componente deseja enviar um pacote ao sistema sob certo tópico. Esta ação pode ser feita por uma série de motivos, como a atualização de um termômetro digital no exemplo da figura anterior. A partir do momento em que o _Broker_ recebe este dado é de sua competência entregá-lo a quem deva, o que caracteriza uma das principais qualidades desta comunicação: a segurança quanto à conexão dos dispositivos. A função _publish_ pode ser emitida por uma série de sensores dispostos em um ambiente com alta interferência como uma indústria, ou amplo e distante como uma lavoura, portanto conectar-se de forma a não exigir sinal forte e constante em todos os pontos é benéfico.
+
+Abordando o _Subscribe_, trata-se da função usada por um componente para sinalizar ao _Broker_ que deseja receber pacotes de determinado tópico. Enquanto a função _Publish_ é requisitada a cada momento em que se deve enviar um pacote, o _Subscribe_ é enviado apenas uma vez, assim que se estabelece a conexão com o dispositivo central.
+
+### Criação do IoT _thing_ no AWS
+
+O AWS fornece uma plataforma de criação, hospedagem e manejo de IoT _things_, chamada AWS IoT Core. Se ainda não houve uma exploração do ambiente AWS, encontre a plataforma com os seguintes passos:
+- [Acesse sua conta no AWS Educate](https://www.awseducate.com/student/s/);
+- Clique em `AWS Account`, na parte superior da tela;
+- Clique no botão `AWS Educate Starter Account` para acessar o _Workbench_ Vocareum;
+>A tela do _Workbench_ Vocareum será visitada mais tarde para obtenção de suas credenciais, no botão `Account Details`. 
+- Clique em `AWS Console`;
+- Na barra de pesquisa, procure e acesse `IoT Core`.
+
+O processo de criação de um IoT _thing_ para este projeto não possui pontos problemáticos, pois embora possa ser customizável, não há nenhum desvio de uma criação padrão. [Este tutorial sobre MQTT e AWS IoT Core](https://aws.amazon.com/pt/premiumsupport/knowledge-center/iot-core-publish-mqtt-messages-python/) fornece um ótimo passo-a-passo. Devem ser vistas as etapas **Create an AWS IoT Core policy**, **Create an AWS IoT thing** e **Copy the AWS IoT Core endpoint URL**.
+
+<p align="center">
+    <img width="100%" height="100%" src="imagens/aaimagem_00_AWSIoT_Tutorial.jpg">
+</p>
+
+Ao fim deste processo devem estar sob domínio os seguintes itens:
+- Arquivos de certificado baixados:
+	- `...-certificate.pem.crt`;
+	- `...-private.pem.key`;
+	- `...-public.pem.key`;
+- Endereço URL de _Endpoint_ do IoT _thing_ criado.
 
 ## Desenvolvimento de _Skill_ Alexa
 
@@ -138,6 +180,82 @@ Estes dois últimos fatores devem ser configurados pelo desenvolvedor. O primeir
     <img width="100%" height="100%" src="imagens/imagem_05_ParametrosSkill02.jpg">
 </p>
 
-Cada possível comando passado por Alexa recebe o nome de _"Intent"_ (intenção). Deverão ser criados todos os _intents_ a se usar com o robô, portanto é necessário listar todos os movimentos que o sistema deverá reconhecer. Considerando que o _hardware_ terá um par de motores DC, controlando os lados esquerdo e direito, é possível 
+Cada possível comando passado por Alexa recebe o nome de _"Intent"_ (intenção). Deverão ser criados todos os _intents_ a se usar com o robô, portanto é necessário listar os movimentos que o sistema deverá reconhecer. Considerando que o _hardware_ terá um par de motores DC independentes controlando os lados esquerdo e direito, é possível realizar movimentos de translação frontal/traseira , com motores acionados com mesmo sentido, e rotação em torno do próprio eixo, com motores acionados em sentido contrário.
+
+Por precisão e facilidade de uso é possível também definir funções de movimentos curtos, em que o robô inicia e para a ação em um intervalo de tempo. Define-se então a gama de comandos que o dispositivo Alexa deve reconhecer:
+- Movimento para frente;
+- Movimento para trás;
+- Rotação horária;
+- Rotação anti-horária;
+- Movimento para frente por um curto período;
+- Movimento para trás por um curto período;
+- Rotação horária por um curto período;
+- Rotação anti-horária por um curto período;
+- Parar.
+
+A criação de _intents_ é feita a partir do menu **"Intents"** dentro da aba **"Interaction Model"**. O console fornece seis _intents_ padrão, que não se envolvem com este projeto. Para criar o primeiro _intent_ personalizado clique em `+ Add Intent`. 
+
+<p align="center">
+    <img width="100%" height="100%" src="imagens/imagem_06_ParametrosSkill03.jpg">
+</p>
+
+Por ser um _intent_ personalizado, sem relação com formatos pré-configurados da Alexa, deve ser escolhida a opção `Create custom intent`.  Insira um nome para a intenção em um formato sem espaços e que termine em `[...]Intent`, como `MoveForwardIntent`. Este nome será utilizado no código da função Lambda para ativar o comando de movimento curto para a frente, portanto é proveitoso utilizar nomes simples e claros, visto que serão diversos comandos. Clique em `Create custom intent`.
+
+<p align="center">
+    <img width="100%" height="100%" src="imagens/imagem_07_ParametrosSkill04.jpg">
+</p>
+
+O último fator na criação de um _intent_ é o fornecimento de **"Utterances"**, ou enunciados. Eles serão palavras ditas pelo usuário ao dispositivo Alexa para informar o _intent_ desejado. Devem ser colocadas opções variadas para descrever o mesmo comportamento, abrindo opções para a comodidade para o usuário. 
+
+Mantendo-se no exemplo do `MoveForwardIntent`, devem ser escritas expressões que se adequem ao formato da comunicação completa com o dispositivo, visto anteriormente - também cabe reiterar que deve ser utilizada a língua escolhida para esta _skill_. Insira cada possibilidade e clique Enter ou o símbolo `+` para adicionar. Ao fim, clique em `Save Model` na parte superior da tela. Os enunciados utilizados nesse caso foram:
+
+> Alexa, ask Robot One to...
+- `move forward`;
+- `go forward`;
+- `move straight`;
+- `go straight`;
+- `move front`;
+- `go front`.
+
+Esse processo deve ser repetido para todos os comandos do robô. Observa-se exemplos de _intents_ e _utterances_ para todas as funções: 
+
+
+- Movimento para frente:
+	- _Intent_: `MoveForwardPermanentIntent`;
+	- _Utterances_: `just go`, `keep moving forward`;
+
+- Movimento para trás:
+	- _Intent_: `MoveBackwardPermanentIntent`;
+	- _Utterances_: `move  backwards  indefinitely`, `retreat`;
+
+- Rotação horária:
+	- _Intent_: `TurnRightPermanentIntent`;
+	- _Utterances_: `turn  right  permanently`;
+
+- Rotação anti-horária:
+	- _Intent_: `TurnLeftPermanentIntent`;
+	- _Utterances_: `turn  left  indefenitely`;
+
+- Movimento para frente por um curto período:
+	- _Intent_: `MoveForwardIntent`;
+	- _Utterances_: `move forward a bit`, `go straight`;
+
+- Movimento para trás por um curto período:
+	- _Intent_: `MoveBackwardIntent`;
+	- _Utterances_: `move back a bit`, `return`;
+
+- Rotação horária por um curto período:
+	- _Intent_: `TurnRightIntent`;
+	- _Utterance_: `spin clockwise`, `turn right`;
+
+- Rotação anti-horária por um curto período:
+	- _Intent_: `TurnLeftIntent`;
+	- _Utterance_: `spin counter clockwise`, `turn left`;
+
+- Parar:
+	- _Intent_: `StopMovementIntent`;
+	- _Utterances_: `stay in position`, `stop moving`.
+
+O último ponto a se editar na _skill_ Alexa é o **"Endpoint"**. O _Endpoint_ é uma URL armazenada pela _skill_ para enviar os pedidos de _intent_. A primeira figura deste documento ilustra que a _skill_ é ligada a uma função Lambda, o que caracteriza esta conexão. Desta forma o campo de _Endpoint_ deve ser preenchido após ser iniciada a próxima etapa.
 
 
