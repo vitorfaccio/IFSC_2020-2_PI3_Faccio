@@ -1,4 +1,4 @@
-# Controle remoto de robô por meio de Alexa, AWS e Raspberry Pi 3
+# Controle remoto de robô por meio de Alexa, AWS e Raspberry Pi 3 em linguagem Python
 
 - Instituto Federal de Santa Catarina - Câmpus Florianópolis
 - Departamento Acadêmico de Eletrônica
@@ -106,8 +106,8 @@ O AWS fornece uma plataforma de criação, hospedagem e manejo de IoT _things_, 
 - Clique em `AWS Account`, na parte superior da tela;
 - Clique no botão `AWS Educate Starter Account` para acessar o _Workbench_ Vocareum;
 >A tela do _Workbench_ Vocareum será visitada mais tarde para obtenção de suas credenciais, no botão `Account Details`. 
-- Clique em `AWS Console`;
-- Na barra de pesquisa, procure e acesse `IoT Core`.
+- Clique em `AWS Console` para acessar a página principal do ambiente de desenvolvimento do AWS;
+- No menu `Services`, na parte superior, procure e selecione `IoT Core`. Alternativamente faça a busca na barra de pesquisa ao lado.
 
 O processo de criação de um IoT _thing_ para este projeto não possui pontos problemáticos, pois embora possa ser customizável, não há nenhum desvio de uma criação padrão. [Este tutorial sobre MQTT e AWS IoT Core](https://aws.amazon.com/pt/premiumsupport/knowledge-center/iot-core-publish-mqtt-messages-python/) fornece um ótimo passo-a-passo. Devem ser vistas as etapas **Create an AWS IoT Core policy**, **Create an AWS IoT thing** e **Copy the AWS IoT Core endpoint URL**.
 
@@ -256,6 +256,34 @@ Esse processo deve ser repetido para todos os comandos do robô. Observa-se exem
 	- _Intent_: `StopMovementIntent`;
 	- _Utterances_: `stay in position`, `stop moving`.
 
-O último ponto a se editar na _skill_ Alexa é o **"Endpoint"**. O _Endpoint_ é uma URL armazenada pela _skill_ para enviar os pedidos de _intent_. A primeira figura deste documento ilustra que a _skill_ é ligada a uma função Lambda, o que caracteriza esta conexão. Desta forma o campo de _Endpoint_ deve ser preenchido após ser iniciada a próxima etapa.
+Salve sua _skill_ clicando no botão `Save Model` na parte superior da tela.
 
+O último ponto a se editar na _skill_ Alexa é o **"Endpoint"**. O _Endpoint_ é uma URL armazenada pela _skill_ para enviar os pedidos de _intent_. A primeira figura deste documento ilustra que a _skill_ é ligada a uma função Lambda, o que caracteriza esta conexão. Desta forma o campo de _Endpoint_ deve ser preenchido após ser terminada a próxima etapa. 
 
+## Criação de função no  AWS Lambda
+
+A plataforma AWS Lambda é apresentada como um recurso para computação em nuvem quando há a necessidade de se acessar um algoritmo com rapidez, mas sem se preocupar com questões de hospedagem. A função Lambda age como a ponta da _skill_ Alexa, responsável pela comunicação MQTT do dispositivo com o _Broker_. Como dito na seção anterior, o Alexa Developer Console pode criar e hospedar uma função Lambda mas optou-se pelo fornecimento próprio. Foi escolhida a linguagem Python para a função Lambda, para haver um padrão entre todos os códigos desenvolvidos no projeto; a mesma será utilizada adiante no desenvolvimento do controle do robô. É possível ter _devices_ diferentes operando com linguagens Python e Node.js, mas esta estratégia não foi cogitada.
+
+Para iniciar a criação é necessário acessar a plataforma AWS Lambda. Novamente por meio da página `AWS Console` busque a opção `Lambda`.
+
+### Criação da função Lambda
+
+A página geral do AWS Lambda é vista na figura a seguir. Este processo é feito na aba `Funções`, na qual a página já é iniciada.
+
+<p align="center">
+    <img width="100%" height="100%" src="imagens/imagem_08_Lambda01.jpg">
+</p>
+
+Após clicar em `Criar função`, selecione a opção `Explorar o repositório de aplicativos sem servidor`. Na barra de pesquisa logo abaixo, digite `alexa`.
+
+<p align="center">
+    <img width="100%" height="100%" src="imagens/imagem_09_Lambda02.jpg">
+</p>
+
+Clique em `alexa-skills-kit-python36-factskill`. Este _template_ fornece um código em Python com padrão similar ao fornecido pelo console Alexa, o que simplifica o desenvolvimento.
+
+<p align="center">
+    <img width="100%" height="100%" src="imagens/imagem_10_Lambda03.jpg">
+</p>
+
+Ao fim da nova página, escreva um nome para a função no campo `SkillFunctionName`. Ele identifica a função na página inicial e será seguido de uma série de dígitos ao fim do processo. É uma opção editar também os campos `Application name` e `SkillDescription`. Escolhidos os nomes, crie a função Lambda pelo botão `Deploy`.
