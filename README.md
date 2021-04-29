@@ -126,6 +126,8 @@ Ao fim deste processo devem estar sob domínio os seguintes itens:
 
 Para se construir um robô controlado por comandos em Alexa é necessário que se tenha um reconhecimento de voz inteligente. Dispositivos Alexa devem ser capazes de identificar as palavras relacionadas a este caso específico e permitir a correta tomada de decisões. Uma _skill_ Alexa é um conjunto definido de instruções em linguagem humana a serem falados em voz alta pelo usuário final e detectados pelo dispositivo. O desenvolvedor deve considerar nesta etapa todas as ações que o robô pode tomar a cargo do usuário e como isso será comunicado, mas tanto a _skill_ quanto o Alexa Developer Console propiciam facilidade para se adaptar ou adicionar comandos no decorrer do tempo.
 
+O procedimento a seguir é descrito [neste tutorial da Codecademy](https://www.codecademy.com/learn/learn-alexa/modules/learn-alexa-skills-kit), mas será revisto por possuir diversas questões customizáveis relativas ao projeto.
+
 ### Criação da _skill_
 
 Tendo entrado no [Alexa Developer Console](https://developer.amazon.com/alexa/console/ask) com sua conta, a tela inicial será similar à imagem a seguir. Dê inicio aos passos:
@@ -191,7 +193,11 @@ Por precisão e facilidade de uso é possível também definir funções de movi
 - Movimento para trás por um curto período;
 - Rotação horária por um curto período;
 - Rotação anti-horária por um curto período;
-- Parar.
+
+Além dos movimentos, também são necessárias duas funções adicionais:
+
+- Parar o movimento;
+- Encerrar o funcionamento do código.
 
 A criação de _intents_ é feita a partir do menu **"Intents"** dentro da aba **"Interaction Model"**. O console fornece seis _intents_ padrão, que não se envolvem com este projeto. Para criar o primeiro _intent_ personalizado clique em `+ Add Intent`. 
 
@@ -252,9 +258,14 @@ Esse processo deve ser repetido para todos os comandos do robô. Observa-se exem
 	- _Intent_: `TurnLeftIntent`;
 	- _Utterance_: `spin counter clockwise`, `turn left`;
 
-- Parar:
+- Parar o movimento:
 	- _Intent_: `StopMovementIntent`;
 	- _Utterances_: `stay in position`, `stop moving`.
+
+- Encerrar o código:
+	- _Intent_: `ShutdownIntent`;
+	- _Utterances_: `end activity`, `shut down`.
+	> O _utterance_ `shut down` pode ser apontado como conflitante entre os _intents_ `ShutdownIntent` e um padrão da _skill_, mas o console sempre dá preferência aos criados pelo desenvolvedor. 
 
 Salve sua _skill_ clicando no botão `Save Model` na parte superior da tela.
 
@@ -263,6 +274,8 @@ O último ponto a se editar na _skill_ Alexa é o **"Endpoint"**. O _Endpoint_ �
 ## Criação de função no  AWS Lambda
 
 A plataforma AWS Lambda é apresentada como um recurso para computação em nuvem quando há a necessidade de se acessar um algoritmo com rapidez, mas sem se preocupar com questões de hospedagem. A função Lambda age como a ponta da _skill_ Alexa, responsável pela comunicação MQTT do dispositivo com o _Broker_. Como dito na seção anterior, o Alexa Developer Console pode criar e hospedar uma função Lambda mas optou-se pelo fornecimento próprio. Foi escolhida a linguagem Python para a função Lambda, para haver um padrão entre todos os códigos desenvolvidos no projeto; a mesma será utilizada adiante no desenvolvimento do controle do robô. É possível ter _devices_ diferentes operando com linguagens Python e Node.js, mas esta estratégia não foi cogitada.
+
+Novamente o site Codecademy fornece um bom tutorial para a etapa [neste link](https://www.codecademy.com/learn/learn-alexa/modules/learn-alexa-lambda), mas a linguagem utilizada na criação da função é Node.js. Devido a essa diferença, o processo é explorado neste projeto.
 
 Para iniciar a criação é necessário acessar a plataforma AWS Lambda. Novamente por meio da página `AWS Console` busque a opção `Lambda`.
 
@@ -287,3 +300,66 @@ Clique em `alexa-skills-kit-python36-factskill`. Este _template_ fornece um cód
 </p>
 
 Ao fim da nova página, escreva um nome para a função no campo `SkillFunctionName`. Ele identifica a função na página inicial e será seguido de uma série de dígitos ao fim do processo. É uma opção editar também os campos `Application name` e `SkillDescription`. Escolhidos os nomes, crie a função Lambda pelo botão `Deploy`.
+
+<p align="center">
+    <img width="100%" height="100%" src="imagens/imagem_11_Lambda04.jpg">
+</p>
+
+Selecione a opção destacada em `Resources` e siga para a tela da figura a seguir. A função Lambda terá sido criada.
+
+<p align="center">
+    <img width="100%" height="100%" src="imagens/imagem_12_Lambda05.jpg">
+</p>
+
+### Fornecimento de arquivos
+
+A página da função Lambda fornece um editor de arquivos e texto para que se tenha controle sobre a atividade. Os arquivos `lambda_function.py` e `requirements.txt` são  gerados automaticamente e podem ser alterados no próprio site. Este primeiro arquivo deve ser manipulado para adequar-se à ligação com o dispositivo Alexa, pois não é este seu padrão inicial.
+
+<p align="center">
+    <img width="100%" height="100%" src="imagens/imagem_13_Lambda06.jpg">
+</p>
+
+O IoT _thing_ criado anteriormente é projetado para ser seguro para desenvolvedor e usuário, impedindo que componentes alheios misturem-se à conexão por acidente ou invasão. Neste sentido é necessário ter presente em cada dispositivo os certificados criados pelo AWS IoT Core. 
+
+Um contratempo apresentado por esse editor de arquivos é o método de _upload_. É necessário incluir os certificados e dependências do código, mas só é possível fazer o envio de arquivos `.ZIP` e o conteúdo compactado irá substituir todos os do editor. Desta forma sugere-se que se faça _upload_ de um `.ZIP` contendo tanto os certificados quanto os dois arquivos pré-existentes na função Lambda e as bibliotecas necessárias, de forma a tornar o ambiente completo. Para isso é necessário que o desenvolvedor tenha em seu computador os arquivos `.PY`, `.TXT` e dependências, analisados a seguir. 
+
+### Arquivos e dependências
+
+Todos os arquivos utilizados na função Lambda estão disponíveis na pasta [AWS Lambda](AWS%20Lambda/). Inicia-se a análise pelo _script_ principal, o arquivo `lambda_function.py`.
+
+Este código compreende a junção de várias partes. A base do texto é a função fornecida pelo Alexa Developer Console no caso de se optar por criação de função Lambda em Python e hospedagem automáticas, comentado na seção **"Desenvolvimento de _skill_ Alexa - criação da _skill_"**. Adiciona-se os trechos recomendados pelo tutorial [Build an Alexa controlled robot with AWS RoboMaker](https://aws.amazon.com/pt/blogs/robotics/build-alexa-controlled-robot/) .
+
+São adicionados quatro trechos em locais diferentes:
+- importação da biblioteca utilizada;
+- configuração dos certificados e da comunicação MQTT;
+- criação de classes de _Request handlers_;
+- adição das classes criadas ao sistema;
+
+Por utilizar um _Broker_ criado e hospedado a partir do AWS IoT Core, todos os arquivos que estabelecem conexão MQTT devem carregar uma biblioteca específica. Utiliza-se funções da biblioteca [AWS IoT Device SDK for Python](https://github.com/aws/aws-iot-device-sdk-python) para as tarefas de _publish_ e _subscribe_, na função Lambda e no controle do robô respectivamente. Importa-se a biblioteca com o seguinte comando no começo do arquivo:
+
+``` Python
+#### Adicionada biblioteca para comunicação MQTT entre serviços AWS
+from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
+####
+```
+
+O segmento fornecido pelo [tutorial citado](https://aws.amazon.com/pt/blogs/robotics/build-alexa-controlled-robot/) é encontrado na seção **"_Step 2: Create an Alexa skill_ - etapa 8"**. É seu papel informar o diretório dos certificados do IoT _thing_, configurar os parâmetros de MQTT e iniciar a conexão com o _Broker_. O código fornecido possui campos com valores genéricos pois dependerão de dados do projeto de cada desenvolvedor, como URL do _Endpoint_ e nomes dos certificados. Esta seção foi incluída logo após as importações de bibliotecas.
+
+``` Python
+####
+
+####
+```
+
+
+
+As classes de tratamento da comunicação com a _skill_ Alexa devem ser criadas para cada _intent_ individualmente. Estas serão chamadas de _Request handlers_. 
+
+
+
+
+
+
+
+
+
