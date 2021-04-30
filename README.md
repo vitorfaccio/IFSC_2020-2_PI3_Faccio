@@ -199,7 +199,7 @@ Além dos movimentos, também são necessárias duas funções adicionais:
 - Parar o movimento;
 - Encerrar o funcionamento do código.
 
-A criação de _intents_ é feita a partir do menu **"Intents"** dentro da aba **"Interaction Model"**. O console fornece seis _intents_ padrão, que não se envolvem com este projeto. Para criar o primeiro _intent_ personalizado clique em `+ Add Intent`. 
+A criação de _intents_ é feita a partir do menu **"Intents"** dentro da aba **"Interaction Model"**. O console fornece seis _intents_ padrão que podem ser manipulados pelo desenvolvedor, como o comando para encerrar o funcionamento do equipamento. Elas não serão utilizadas, para se manter um padrão de criação. Para inserir o primeiro _intent_ personalizado clique em `+ Add Intent`. 
 
 <p align="center">
     <img width="100%" height="100%" src="imagens/imagem_06_ParametrosSkill03.jpg">
@@ -343,19 +343,87 @@ from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 ####
 ```
 
-O segmento fornecido pelo [tutorial citado](https://aws.amazon.com/pt/blogs/robotics/build-alexa-controlled-robot/) é encontrado na seção **"_Step 2: Create an Alexa skill_ - etapa 8"**. É seu papel informar o diretório dos certificados do IoT _thing_, configurar os parâmetros de MQTT e iniciar a conexão com o _Broker_. O código fornecido possui campos com valores genéricos pois dependerão de dados do projeto de cada desenvolvedor, como URL do _Endpoint_ e nomes dos certificados. Esta seção foi incluída logo após as importações de bibliotecas.
+O segmento fornecido pelo [tutorial citado](https://aws.amazon.com/pt/blogs/robotics/build-alexa-controlled-robot/) é encontrado na seção **"_Step 2: Create an Alexa skill_ - etapa 8"** e possui duas partes. A primeira, vista a seguir, tem papel de informar o diretório dos certificados do IoT _thing_, configurar os parâmetros de MQTT e iniciar a conexão com o _Broker_. O código fornecido possui campos com valores genéricos pois dependerão de dados do projeto de cada desenvolvedor, como URL do _Endpoint_ e nomes dos certificados; estes são destacados com comentários a cada linha. Esta seção foi incluída logo após as importações de bibliotecas.
 
 ``` Python
-####
+#### Trecho para setup dos certificados necessários e da comunicaçao MQTT
+# Parameters for AWS IoT MQTT Client.
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+iotThingEndpoint = "URL_ENDPOINT" # Endpoint do Broker criado na primeira etapa.
+iotThingPort = 8883
+iotTopic = "PI3Robot-Topic01"
+
+# Endereço dos certificados. Por padrao devem estar inseridos na pasta "certificates".
+rootCAPath = "./certificates/root.pem" # localizaçao do certificado Root - adapte se o nome do arquivo for diferente
+privateKeyPath = "./certificates/XXXX-private.pem.key" # localizaçao da chave privada "...-private.pem.key"
+certificatePath = "./certificates/XXXX-certificate.pem.crt" # localizaçao do certificado "...-certificate.pem.crt"
+
+# Init AWSIoTMQTTClient
+skillIoTMQTTClient = AWSIoTMQTTClient("PI3Robot-Publisher01")
+skillIoTMQTTClient.configureEndpoint(iotThingEndpoint,iotThingPort)
+skillIoTMQTTClient.configureCredentials(rootCAPath, privateKeyPath, certificatePath)
+
+skillIoTMQTTClient.connect()
+logger.info("mqtt connected")
 ####
 ```
 
+As classes de tratamento da comunicação com a _skill_ Alexa devem ser criadas para cada _intent_ individualmente. Estas serão chamadas de _Request handlers_. Elas descrevem os comportamentos da função Lambda para se comunicar com o _Broker_ e devolver uma resposta ao dispositivo Alexa, que será transmitida ao usuário.  O arquivo original fornece estas classes por padrão:
 
+- `LaunchRequestHandler()`;
+- `HelloWorldIntentHandler()`;
+- `HelpIntentHandler()`;
+- `CancelOrStopIntentHandler()`;
+- `SessionEndedRequestHandler()`;
+- `IntentReflectorHandler()`;
+- `CatchAllExceptionHandler()`.
 
-As classes de tratamento da comunicação com a _skill_ Alexa devem ser criadas para cada _intent_ individualmente. Estas serão chamadas de _Request handlers_. 
+Foi escolhido inserir as classes novas entre `HelloWorldIntentHandler()` e `HelpIntentHandler()`. Seu formato é visto a seguir.
 
+```Python
+class MoveForwardIntentHandler(AbstractRequestHandler):
+"""Handler for Move Forward Intent."""
+	def can_handle(self, handler_input):
+		# type: (HandlerInput) -> bool
+		return ask_utils.is_intent_name("MoveForwardIntent")(handler_input)
 
+	def handle(self, handler_input):
+		# type: (HandlerInput) -> Response
+		speak_output = "Ok, move forward"
+		skillIoTMQTTClient.publish(iotTopic, "forward", 1)
+		return (	
+			handler_input.response_builder
+				.speak(speak_output)
+				.response
+)
+```
+
+Devem ser alterados para cada _handler_ os seguintes pontos:
+
+- `class  MoveForwardIntentHandler(AbstractRequestHandler):` - nome da classe: deve ser alterado para `NomeDoIntent` + `Handler`;
+- `return ask_utils.is_intent_name("MoveForwardIntent")(handler_input)` - checagem do _intent_ requisitado com o determinado _handler_: deve ser alterado o nome do _intent_; 
+- `speak_output =  "Ok, move forward"` - resposta da função Lambda à Alexa, que será transmitida por som ao usuário: deve ser adequada para cada situação e é sugerível que se utilize frases consistentes, mas manteve-se apenas a repetição do comando escolhido;
+- `skillIoTMQTTClient.publish(iotTopic,  "forward",  1)` - função de `publish` de mensagem MQTT ao _broker_ : trata-se do objeto fundamental da comunicação MQTT entre os dispositivos. Deve se manter o mesmo nome `iotTopic` entre função Lambda e controle do robô, mas é necessário alterar o segundo argumento da função em cada caso. A palavra entre aspas é o pacote a ser transmitido que será analisado pelo _subscriber_, a modo de se tomar as devidas decisões. Deve ser colocada uma palavra-chave para cada _handler_ ligada ao comando específico.
+> Embora não vá alterar o funcionamento da função, sugere-se também alterar o comentário na segunda linha do exemplo para evitar acidentes durante a replicação das classes. 
+
+Por fim é necessário incrementar ao fim do código as funções de adição das classes ao objeto `SkillBuilder`. O trecho a seguir apresenta as funções acrescentadas, novamente colocadas entre as referentes a `HelloWorldIntentHandler()` e `HelpIntentHandler()`. Cada novo _handler_ deve ser incluído nesse trecho para que a função Lambda reconheça o pedido do dispositivo Alexa.
+
+```Python
+sb.add_request_handler(MoveForwardIntentHandler())
+sb.add_request_handler(MoveBackwardIntentHandler())
+sb.add_request_handler(TurnLeftIntentHandler())
+sb.add_request_handler(TurnRightIntentHandler())
+sb.add_request_handler(MoveForwardPermanentIntentHandler())
+sb.add_request_handler(MoveBackwardPermanentIntentHandler())
+sb.add_request_handler(TurnLeftPermanentIntentHandler())
+sb.add_request_handler(TurnRightPermanentIntentHandler())
+
+sb.add_request_handler(StopMovementIntentHandler())
+sb.add_request_handler(ShutdownIntentHandler())
+```
 
 
 
