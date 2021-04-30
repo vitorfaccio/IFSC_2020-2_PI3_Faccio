@@ -1,7 +1,7 @@
 
 
 # README
-Arquivos utilizados na função Lambda. Inclui os arquivos prontos:
+Arquivos utilizados na função Lambda. Compacte em formato `.ZIP` e faça o _upload_ no console AWS Lambda. Inclui os arquivos:
 
 - `lambda_function.py`
 - `requirements.txt`
