@@ -11,30 +11,18 @@
 - Período de execução entre outubro de 2020 e abril de 2021
 
 Conteúdo:
-[Introdução](#introdução)
-
-[Proposta](#proposta)
-
-[Arquitetura do projeto](#arquitetura-do-projeto)
-
-[Componentes necessários](#componentes-necessários)
-
-[Bons guias iniciais](#bons-guias-iniciais)
-
-[Núcleos de trabalho](#núcleos-de-trabalho)
-
-[**PRIMEIRA ETAPA**](#primeira-etapa)
-
-[Criação de  _thing_  em AWS IoT](#criação-de-thing-em-aws-iot)
-
-[Desenvolvimento de _Skill_ Alexa](#desenvolvimento-de-skill-alexa)
-
-[Criação de função no AWS Lambda](#criação-de-função-no-aws-lambda)
-
-[Teste de conectividade entre componentes em nuvem](#teste-de-conectividade-entre-componentes-em-nuvem)
-
-[Exploração do ambiente AWS RoboMaker e simulação do robô](#exploração-do-ambiente-aws-robomaker-e-simulação-do-robô)
-
+- [Introdução](#introdução)
+- [Proposta](#proposta)
+- [Arquitetura do projeto](#arquitetura-do-projeto)
+- [Componentes necessários](#componentes-necessários)
+- [Bons guias iniciais](#bons-guias-iniciais)
+- [Núcleos de trabalho](#núcleos-de-trabalho)
+- [**PRIMEIRA ETAPA**](#primeira-etapa)
+- [Criação de  _thing_  em AWS IoT](#criação-de-thing-em-aws-iot)
+- [Desenvolvimento de _Skill_ Alexa](#desenvolvimento-de-skill-alexa)
+- [Criação de função no AWS Lambda](#criação-de-função-no-aws-lambda)
+- [Teste de conectividade entre componentes em nuvem](#teste-de-conectividade-entre-componentes-em-nuvem)
+- [Exploração do ambiente AWS RoboMaker e simulação do robô](#exploração-do-ambiente-aws-robomaker-e-simulação-do-robô)
 
 ## Introdução
 
