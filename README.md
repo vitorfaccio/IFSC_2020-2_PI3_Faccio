@@ -10,6 +10,21 @@
 - Aluno: Vítor Faccio - vitorfaccio.ifsc@gmail.com
 - Período de execução entre outubro de 2020 e abril de 2021
 
+Conteúdo:
+[Introdução](#introdução)
+[Proposta](#proposta)
+[Arquitetura do projeto](#arquitetura-do-projeto)
+[Componentes necessários](#componentes-necessários)
+[Bons guias iniciais](#bons-guias-iniciais)
+[Núcleos de trabalho](#núcleos-de-trabalho)
+[**PRIMEIRA ETAPA**](#primeira-etapa)
+[Criação de  _thing_  em AWS IoT](#criação-de-thing-em-aws-iot)
+[Desenvolvimento de _Skill_ Alexa](#desenvolvimento-de-skill-alexa)
+[Criação de função no AWS Lambda](#criação-de-função-no-aws-lambda)
+[Teste de conectividade entre componentes em nuvem](#teste-de-conectividade-entre-componentes-em-nuvem)
+[Exploração do ambiente AWS RoboMaker e simulação do robô](#exploração-do-ambiente-aws-robomaker-e-simulação-do-robô)
+
+
 ## Introdução
 
 Este projeto foi desenvolvido como objeto de avaliação da unidade curricular PI3, compreendendo diversas etapas abordadas ao longo do semestre letivo 2020-2 do Instituto Federal de Santa Catarina (IFSC). 
@@ -271,7 +286,7 @@ Salve sua _skill_ clicando no botão `Save Model` na parte superior da tela.
 
 O último ponto a se editar na _skill_ Alexa é o **"Endpoint"**. O _Endpoint_ é uma URL armazenada pela _skill_ para enviar os pedidos de _intent_. A primeira figura deste documento ilustra que a _skill_ é ligada a uma função Lambda, o que caracteriza esta conexão. Desta forma o campo de _Endpoint_ deve ser preenchido após ser terminada a próxima etapa. 
 
-## Criação de função no  AWS Lambda
+## Criação de função no AWS Lambda
 
 A plataforma AWS Lambda é apresentada como um recurso para computação em nuvem quando há a necessidade de se acessar um algoritmo com rapidez, mas sem se preocupar com questões de hospedagem. A função Lambda age como a ponta da _skill_ Alexa, responsável pela comunicação MQTT do dispositivo com o _Broker_. Como dito na seção anterior, o Alexa Developer Console pode criar e hospedar uma função Lambda mas optou-se pelo fornecimento próprio. Foi escolhida a linguagem Python para a função Lambda, para haver um padrão entre todos os códigos desenvolvidos no projeto; a mesma será utilizada adiante no desenvolvimento do controle do robô. É possível ter _devices_ diferentes operando com linguagens Python e Node.js, mas esta estratégia não foi cogitada.
 
