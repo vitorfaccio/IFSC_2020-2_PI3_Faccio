@@ -321,7 +321,7 @@ A página da função Lambda fornece um editor de arquivos e texto para que se t
 
 O IoT _thing_ criado anteriormente é projetado para ser seguro para desenvolvedor e usuário, impedindo que componentes alheios misturem-se à conexão por acidente ou invasão. Neste sentido é necessário ter presente em cada dispositivo os certificados criados pelo AWS IoT Core. 
 
-Um contratempo apresentado por esse editor de arquivos é o método de _upload_. É necessário incluir os certificados e dependências do código, mas só é possível fazer o envio de arquivos `.ZIP` e o conteúdo compactado irá substituir todos os do editor. Desta forma sugere-se que se faça _upload_ de um `.ZIP` contendo tanto os certificados quanto os dois arquivos pré-existentes na função Lambda e as bibliotecas necessárias, de forma a tornar o ambiente completo. Para isso é necessário que o desenvolvedor tenha em seu computador os arquivos `.PY`, `.TXT` e dependências, analisados a seguir. 
+Um contratempo apresentado por esse editor de arquivos é o método de _upload_, por meio do botão `Fazer upload de` . É necessário incluir os certificados e dependências do código, mas só é possível fazer o envio de arquivos `.ZIP` e o conteúdo compactado irá substituir todos os do editor. Desta forma sugere-se que se faça _upload_ de um `.ZIP` contendo tanto os certificados quanto os dois arquivos pré-existentes na função Lambda e as bibliotecas necessárias, de forma a tornar o ambiente completo. Para isso é necessário que o desenvolvedor tenha em seu computador os arquivos `.PY`, `.TXT` e dependências, analisados a seguir. Sugere-se que as alterações vistas a seguir sejam realizadas dentro de um editor de texto no próprio computador do desenvolvedor, não na ferramenta do console AWS Lambda.
 
 ### Arquivos e dependências
 
@@ -425,9 +425,83 @@ sb.add_request_handler(StopMovementIntentHandler())
 sb.add_request_handler(ShutdownIntentHandler())
 ```
 
+Como citado anteriormente, após o término da edição do arquivo `lambda_function.py` é preciso criar o arquivo `.ZIP` com todas as partes necessárias e enviá-lo ao console AWS Lambda por meio do botão `Fazer upload de`.  O último passo a se concluir é ativar a função: clique no botão laranja `Deploy`.
 
+## Teste de conectividade entre componentes em nuvem
 
+Antes de prosseguir à simulação do robô na plataforma AWS RoboMaker é proveitoso conferir o funcionamento do sistema desenvolvido até então. O intuito das etapas anteriores é garantir o trânsito de informações do dispositivo Alexa ao robô por meio de mensagens MQTT, que são manejadas pelo _broker_ no console AWS IoT Core. 
 
+O ponto de entrada de informações é o dispositivo Alexa, que capta as mensagens de voz do usuário final, enquanto a saída deste sistema reduzido é o próprio _broker_ -- ao qual será conectada a placa de controle do robô. Ambos possuem consoles de desenvolvimento com ferramentas para teste, com visualização de dados em dados em tempo real. É possível enviar frases escritas à _skill_ no Alexa Developer Console e ler os pacotes enviados a um IoT _thing_, inscrevendo-se em um tópico. 
 
+### Configuração dos consoles
 
+A ferramenta de testes do Alexa Developer Console é encontrada na página de edição da _skill_, vista na seção **Desenvolvimento de _skill_ Alexa - Parâmetros e comandos da _skill_**, ao se clicar na opção `Test` na aba superior.
 
+<p align="center">
+    <img width="100%" height="100%" src="imagens/imagem_14_Teste01.jpg">
+</p>
+
+A opção `Skill testing is enabled in:` deve ser posta em `Development` para habilitar o envio de mensagens. Mantenha a linguagem em `English (US)` e a opção de inserção de dados em `Alexa Simulator`. No campo `Type or click and hold the mic` deve ser escrita a mensagem para simular a voz do usuário, seguindo os parâmetros determinados previamente.
+
+Retornando ao AWS IoT Core, verifique a aba esquerda e busque as opções `Testar`e `Cliente de teste MQTT`. Neste menu é possível escolher se o cliente de testes enviará ou receberá mensagens de determinado tópico comandado por _things_ registrados na conta. Será testado o envio das mensagens MQTT com destino ao robô, logo é preciso agir como um _subscriber_ -- portanto selecione `Assinar um tópico` e preencha o `Filtro de tópicos` com o mesmo nome de tópico utilizado na função Lambda. Para exibir o resulado em um formato sem erros, abra o sub-menu `Configuração adicional` e na opção `Exibição da carga útil MQTT` selecione `Exibir cargas úteis como strings (mais preciso)`. Por fim confirme com o botão `Inscrever-se`.
+
+<p align="center">
+    <img width="100%" height="100%" src="imagens/imagem_15_Teste02.jpg">
+</p>
+
+### Execução do teste
+
+Após se configurar as duas plataformas é possível iniciar o teste. São colocadas à prova duas conexões: entre Alexa e função Lambda, entre função Lambda e IoT _thing_; elas serão conferidas nos consoles da Alexa e do AWS IoT Core respectivamente.
+
+Na ferramenta de testes do Alexa Developer Console, escreva um comando de voz no molde citado anteriormente, iniciando pelo primeiro _intent_ abordado:
+
+- `Alexa, ask robot one to move forward`
+
+<p align="center">
+    <img width="100%" height="100%" src="imagens/imagem_15_Teste02.jpg">
+</p>
+
+O ambiente de teste deve se conectar à função Lambda e executar os comandos definidos no tratamento do _intent_. Isto prevê a emissão de mensagem MQTT ao _broker_ mas também um retorno ao dispositivo, visto aqui como a resposta `Ok, move forward`. Configura-se assim a correta formação destes dois componentes.
+
+Avaliando o ambiente de teste do AWS IoT Core deve se obter a entrega de um pacote com palavra-chave referente ao _intent_. Como dito anteriormente, o enunciado `move forward`se refere ao _intent_ `MoveForwardIntent`, cujo handler na função Lambda emite mensagem MQTT com conteúdo `forward`. O aparecimento deste pacote sinaliza a correta ligação entre todos os componentes.
+
+<p align="center">
+    <img width="100%" height="100%" src="imagens/imagem_16_Teste03.jpg">
+</p>
+
+Continue os testes para cada comando criado, para verificar o funcionamento completo antes da simulação do robô.
+
+<p align="center">
+    <img width="100%" height="100%" src="imagens/imagem_17_Teste04.jpg">
+</p>
+
+<p align="center">
+    <img width="100%" height="100%" src="imagens/imagem_18_Teste05.jpg">
+</p>
+
+### Falhas frequentes
+
+É possível que aconteçam erros na escrita da _skill_ Alexa e da função Lambda, por se tratar de processos com várias etapas envolvidas e replicação de passos. A seguir discute-se os principais equívocos a se cometer:
+
+- **Alexa reconhece _intent_ errado**: a _skill_ é forçada a reconhecer a frase comunicada como algum dos _intents_. Para o exemplo a seguir o _intent_ `TurnRightPermanentIntent` foi excluído do sistema. Ao recebê-lo o dispositivo o reconheceu como `TurnRightIntent`, que possui o enunciado mais semelhante. Em seguida foi enviado um enunciado totalmente desconexo de qualquer um programado, o que também foi reconhecido como um _intent_. Se os testes apontam que o dispositivo não reconhece um _intent_ específico, verifique se ele foi criado e configurado corretamente.
+	<p align="center">
+    <img width="100%" height="100%" src="imagens/imagem_19_Erros01.jpg">
+	</p>
+
+- **Alexa responde "_Sorry, I had trouble doing what you asked. Please try again_"**: o _intent_ específico não foi reconhecido pela função Lambda. Isto pode ocorrer por desencontro do nome do _intent_ entre os dois consoles, como algum erro de digitação na classe, ou por falta da função `sb.add_request_handler()` referente a tal comando ao final do código.
+	<p align="center">
+    <img width="100%" height="100%" src="imagens/imagem_20_Erros02.jpg">
+	</p>
+
+- **Alexa responde "_There was a problem with the requested skill's response_"**: ocorre quando há algum erro de sintaxe na função Lambda. Nenhum comando no console Alexa terá sucesso. Revise sua função Lambda completamente, atentando-se principalmente a esses detalhes:
+	- Erro de digitação em alguma parte do arquivo `lambda_function.py`;
+	- Declaração errada do endereço dos certificados;
+	- IoT _thing Endpoint_ errado;
+	- Pasta `certificates` e respectivos arquivos não incluídos corretamente;
+	- Pasta `AWSIoTPythonSDK` e respectivos arquivos não incluídos corretamente;
+	
+	<p align="center">
+    <img width="100%" height="100%" src="imagens/imagem_21_Erros03.jpg">
+	</p>
+
+- **Alexa responde corretamente mas cliente de teste MQTT não apresenta o pacote**: a comunicação entre a _skill_ Alexa e a função Lambda acontece sem problemas e o arquivo `lambda_function.py` possui endereço de IoT _thing Endpoint_ válido, caso contrário o problema seria do caso anterior. Tenha certeza de que o _Endpoint_ é referente ao IoT _thing_ correto, no caso de se ter criado vários na mesma conta. Se o cliente de teste MQTT ainda não apresenta o recebimento do pacote enviado pela função Lambda, verifique se este está se inscrevendo no tópico correto, com nome igual ao `iotTopic` no arquivo `.PY` da função.
