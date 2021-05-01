@@ -504,6 +504,24 @@ Continue os testes para cada comando criado, para verificar o funcionamento comp
     <img width="100%" height="100%" src="imagens/imagem_21_Erros03.jpg">
 	</p>
 
-- **Alexa responde corretamente mas cliente de teste MQTT não apresenta o pacote**: a comunicação entre a _skill_ Alexa e a função Lambda acontece sem problemas e o arquivo `lambda_function.py` possui endereço de IoT _thing Endpoint_ válido, caso contrário o problema seria do caso anterior. Tenha certeza de que o _Endpoint_ é referente ao IoT _thing_ correto, no caso de se ter criado vários na mesma conta. Se o cliente de teste MQTT ainda não apresenta o recebimento do pacote enviado pela função Lambda, verifique se este está se inscrevendo no tópico correto, com nome igual ao `iotTopic` no arquivo `.PY` da função.
+- **Alexa responde corretamente mas ferramenta de teste MQTT não apresenta o pacote**: a comunicação entre a _skill_ Alexa e a função Lambda acontece sem problemas e o arquivo `lambda_function.py` possui endereço de IoT _thing Endpoint_ válido, caso contrário o problema seria do caso anterior. Tenha certeza de que o _Endpoint_ é referente ao IoT _thing_ correto, no caso de se ter criado vários na mesma conta. Se o cliente de teste MQTT ainda não apresenta o recebimento do pacote enviado pela função Lambda, verifique se este está inscrito no tópico correto, com nome igual ao `iotTopic` no arquivo `.PY` da função.
 
-## Exploração e simulação do robô no ambiente AWS RoboMaker
+## Exploração do ambiente AWS RoboMaker e simulação do robô
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
