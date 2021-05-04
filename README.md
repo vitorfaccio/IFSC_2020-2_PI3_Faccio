@@ -10,7 +10,7 @@
 - Aluno: Vítor Faccio - vitorfaccio.ifsc@gmail.com
 - Período de execução entre outubro de 2020 e abril de 2021
 
-Conteúdo:
+### Conteúdo:
 - [Introdução](#introdução)
 - [Proposta](#proposta)
 - [Arquitetura do projeto](#arquitetura-do-projeto)
@@ -22,6 +22,7 @@ Conteúdo:
 - [Desenvolvimento de _Skill_ Alexa](#desenvolvimento-de-skill-alexa)
 - [Criação de função no AWS Lambda](#criação-de-função-no-aws-lambda)
 - [Teste de conectividade entre componentes em nuvem](#teste-de-conectividade-entre-componentes-em-nuvem)
+- [Falhas frequentes - _Troubleshooting_](#falhas-frequentes---troubleshooting)
 - [Exploração do ambiente AWS RoboMaker e simulação do robô](#exploração-do-ambiente-aws-robomaker-e-simulação-do-robô)
 
 ## Introdução
@@ -30,7 +31,7 @@ Este projeto foi desenvolvido como objeto de avaliação da unidade curricular P
 
 A pandemia de Covid-19 iniciada em 2020 causou a proibição de aulas presenciais e o uso de laboratórios, acarretando em uma forte limitação do escopo desta atividade na questão de implementação e testes práticos. A unidade curricular PI3 tem o propósito de unir aprendizados de _software_ e _hardware_ dentro de um único projeto, porém para contornar a dependência de testes físicos complexos optou-se por um sistema mais virtual, com ênfase em comunicação e processamento em nuvem, e _hardware_ simplificado -- mas aberto a aprimoramentos futuros. 
 
-Neste sentido surgiu a oportunidade de explorar o Amazon Web Services (AWS) e seu ambiente de desenvolvimento de robótica, o AWS RoboMaker, ainda pouco abordados no curso. O AWS é uma plataforma de desenvolvimento e computação em nuvem dos mais variados tipos de serviço, desde controle de frotas de robôs a instanciamento em larga escala de máquinas virtuais, ferramentas de _machine learning_ e análise de dados. Este aglomerado dá abertura a inúmeras possibilidades em empresas dentro e fora do ramo da tecnologia, visto que comunicação e automatização de processos com segurança digital são qualidades que podem afetar qualquer setor.
+Neste sentido surgiu a oportunidade de explorar o Amazon Web Services (AWS) e seu ambiente de desenvolvimento de robótica, o AWS RoboMaker, ainda pouco abordados no curso. O AWS é uma plataforma de desenvolvimento e computação em nuvem com os mais variados tipos de serviço, desde controle de frotas de robôs a instanciamento em larga escala de máquinas virtuais, ferramentas de _machine learning_ e análise de dados. Este aglomerado dá abertura a inúmeras possibilidades em empresas dentro e fora do ramo da tecnologia, visto que comunicação e automatização de processos com segurança digital são qualidades que podem afetar qualquer setor.
 
 De maneira complementar, o sistema de reconhecimento de voz Alexa e uma placa Raspberry Pi foram cogitados como bons elementos para a integração de sistemas, constituindo o _frontend_ do _software_ e o _hardware_.
 
@@ -185,7 +186,7 @@ Sendo concluída a criação da _skill_ é necessário definir as característic
 
 A frase ilustra o que o usuário deve falar para se comunicar com o dispositivo Alexa. São destacadas as seguintes partes com seus exemplos:
 
-- **"Wake word"**: palavra-chave para o dispositivo começar a voz captada. Trata-se do próprio nome `Alexa`;
+- **"Wake word"**: palavra-chave para o dispositivo começar a voz captada. Refere-se ao próprio nome `Alexa`;
 - **"Starting phrase"**: início da frase, especifica qual tipo de requisição será passado. Pode ser de diferentes tipos, mas aqui será restrito ao `ask` pois será feito um "pedido" para que o robô se mova;
 - **"Skill invocation name"**: Nome de invocação da _skill_. Não é o nome escolhido na etapa anterior, trata-se de um nome simples e memorável que o usuário irá falar para invocar tal _skill_. O exemplo utiliza o nome `History Buff` para chamar uma _skill_ de pesquisa de fatos históricos, mas neste projeto o usuário deve chamar pelo nome do robô;
 - **"Utterance"**: especifica qual comando será buscado na _skill_ utilizada, por exemplo qual movimento será requisitado para se passar ao robô.
@@ -493,7 +494,7 @@ Continue os testes para cada comando criado, para verificar o funcionamento comp
     <img width="100%" height="100%" src="imagens/imagem_18_Teste05.jpg">
 </p>
 
-### Falhas frequentes
+## Falhas frequentes - _Troubleshooting_
 
 É possível que aconteçam erros na escrita da _skill_ Alexa e da função Lambda, por se tratar de processos com várias etapas envolvidas e replicação de passos. A seguir discute-se os principais equívocos a se cometer:
 
@@ -522,6 +523,16 @@ Continue os testes para cada comando criado, para verificar o funcionamento comp
 
 ## Exploração do ambiente AWS RoboMaker e simulação do robô
 
+Um dos mais potentes instrumentos do conglomerado AWS para este projeto é a plataforma AWS RoboMaker. Refere-se a um serviço de elaboração e controle de aplicações robóticas, com suporte para simulação e implementação em larga escala. Seu uso facilita o processo de criação de um robô por fornecer ferramentas prontas e adequadas à situação, poupando trabalho em fases problemáticas, desviando a carga computacional da máquina do desenvolvedor e agrupando tarefas relacionadas a diferentes etapas do desenvolvimento.
+
+### Ferramentas do AWS RoboMaker
+
+O AWS RoboMaker tem como princípio a reunião de aparatos para todo o desenvolvimento do _software_ de um robô. É possível elaborar um algoritmo de controle, testá-lo e enviá-lo a uma placa ligada à conta AWS do desenvolvedor, que irá qualificar o funcionamento do robô de maneira remota. Para isso o AWS RoboMaker oferece o seguinte ferramental:
+
+- **Ambiente de desenvolvimento**:
+- **Criação de mundos**:
+- **Ambiente de simulação**:
+- **Gerenciamento de frotas**:
 
 
 
@@ -534,8 +545,13 @@ Continue os testes para cada comando criado, para verificar o funcionamento comp
 
 
 
-
-
-
-
-
+# To do
+Antes da parte 2, falar de:
+- Convênio do IFSC com o AWS (no início do trabalho)
+- Estrutura física do robô, seguindo o PI3 do Lucas (no início do trabalho)
+- Serviços dentro do AWS RoboMaker
+	- Máquina virtual
+- Expansibilidade de um projeto feito no AWS RoboMaker
+- Greengrass
+- Controle de frota
+- ROS
