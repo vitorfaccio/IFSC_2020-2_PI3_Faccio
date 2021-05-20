@@ -519,7 +519,7 @@ Continue os testes para cada comando criado, para verificar o funcionamento comp
     <img width="100%" height="100%" src="imagens/imagem_21_Erros03.jpg">
 	</p>
 
-- **Alexa responde corretamente mas ferramenta de teste MQTT não apresenta o pacote**: a comunicação entre a _skill_ Alexa e a função Lambda acontece sem problemas e o arquivo `lambda_function.py` possui endereço de IoT _thing Endpoint_ válido, caso contrário o problema seria do caso anterior. Tenha certeza de que o _Endpoint_ é referente ao IoT _thing_ correto, no caso de se ter criado vários na mesma conta. Se o cliente de teste MQTT ainda não apresenta o recebimento do pacote enviado pela função Lambda, verifique se este está inscrito no tópico correto, com nome igual ao `iotTopic` no arquivo `.PY` da função.
+- **Alexa responde corretamente mas ferramenta de teste MQTT não apresenta o pacote**: a comunicação entre a _skill_ Alexa e a função Lambda acontece sem problemas e o arquivo `lambda_function.py` possui endereço de IoT _thing Endpoint_ válido, caso contrário o problema seria do caso anterior. Tenha certeza de que o _Endpoint_ é referente a um IoT _thing_ cadastrado na conta AWS do desenvolvedor. Se o cliente de teste MQTT ainda não apresenta o recebimento do pacote enviado pela função Lambda, verifique se este está inscrito no tópico correto, com nome igual ao `iotTopic` no arquivo `.PY` da função.
 
 ## Exploração do ambiente AWS RoboMaker e simulação do robô
 
@@ -529,10 +529,24 @@ Um dos mais potentes instrumentos do conglomerado AWS para este projeto é a pla
 
 O AWS RoboMaker tem como princípio a reunião de aparatos para todo o desenvolvimento do _software_ de um robô. É possível elaborar um algoritmo de controle, testá-lo e enviá-lo a uma placa ligada à conta AWS do desenvolvedor, que irá qualificar o funcionamento do robô de maneira remota. Para isso o AWS RoboMaker oferece o seguinte ferramental:
 
-- **Ambiente de desenvolvimento**:
-- **Criação de mundos**:
-- **Ambiente de simulação**:
-- **Gerenciamento de frotas**:
+- **Ambiente de desenvolvimento**: a aplicação robótica desenvolvida será levada a um sistema operacional embarcado em um robô físico, no caso deste projeto em uma placa Raspberry Pi 3. Com o AWS RoboMaker é possível criar uma máquina virtual (_Virtual Machine_ - VM) hospedada em nuvem com uma estrutura completa voltada ao desenvolvimento de robôs, o que poupa muito trabalho e evita erros na configuração do ambiente. Esta VM possui programas para editar, compilar e ativar o código a ser utilizado pelo robô por meio de terminais da mesma forma que se faria no sistema embarcado.
+
+- **Criação de mundos**: um "mundo" é o ambiente material visto durante a simulação do robô. Pode servir para mostrar como o aparelho se comporta em relação ao ambiente e a objetos. 
+
+- **Ambiente de simulação**: o AWS RoboMaker oferece uma suite com _softwares_ de simulação robótica, capazes de representar sistemas mecânicos, sensores eletrônicos e comunicação externa de um aparelho. Novamente obtém-se a vantagem de receber uma estrutura previamente ajustada para o trabalho com elementos do AWS. 
+
+- **Gerenciamento de frotas**: em termos industriais ou de larga escala, a ferramenta de gerenciamento de frotas é a mais importante e insubstituível do AWS RoboMaker. Trata-se de aparatos para o gerenciamento de robôs reais, com a possibilidade de envio de novas aplicações ou atualizações remotamente a conjuntos numerosos de aparelhos, além de permitir monitorar o funcionamento destes na plataforma AWS.
+
+Os dois principais recursos utilizados neste projeto são os ambientes de desenvolvimento e simulação. Antes de se abordar o código de controle do robô é preciso contextualizar-se sobre o _software_ Robot Operating System (ROS), um programa _open source_ de controle de aplicações robóticas. Apesar do nome, não se trata de um sistema operacional - este é operado em cima de alguma distribuição Linux ou de Windows. A máquina virtual criada pelo AWS RoboMaker já integra o ROS e seus tutoriais ensinam os comandos necessários pra fazer seu uso. 
+
+Por não ser uma ferramenta trivial ou de entendimento rápido, é recomendado ler a respeito do ROS e compreender seu conceito. Os seguintes _links_ podem ser bons pontos de partida:
+- [ROS Wiki - What is ROS?](http://wiki.ros.org/ROS/Introduction)
+- [The Robotics Back-End - What is ROS?](https://roboticsbackend.com/what-is-ros/#What_is_ROS)
+- [AWS Open Source Blog - The Open Source Robot Operating System (ROS) and AWS RoboMaker](https://aws.amazon.com/pt/blogs/opensource/open-source-robot-operating-system-ros-aws-robomaker/)
+
+
+
+### Ambiente de desenvolvimento
 
 
 
@@ -544,14 +558,3 @@ O AWS RoboMaker tem como princípio a reunião de aparatos para todo o desenvolv
 
 
 
-
-# To do
-Antes da parte 2, falar de:
-- Convênio do IFSC com o AWS (no início do trabalho)
-- Estrutura física do robô, seguindo o PI3 do Lucas (no início do trabalho)
-- Serviços dentro do AWS RoboMaker
-	- Máquina virtual
-- Expansibilidade de um projeto feito no AWS RoboMaker
-- Greengrass
-- Controle de frota
-- ROS
