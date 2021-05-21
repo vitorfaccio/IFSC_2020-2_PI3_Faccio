@@ -377,6 +377,7 @@ sb.add_request_handler(TurnRightPermanentIntentHandler())
 
 sb.add_request_handler(StopMovementIntentHandler())
 sb.add_request_handler(ShutdownIntentHandler())
+# Adicione os add_request_handlers para suas novas classes aqui
 
 sb.add_request_handler(HelpIntentHandler())
 sb.add_request_handler(CancelOrStopIntentHandler())
