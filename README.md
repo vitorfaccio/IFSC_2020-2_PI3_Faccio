@@ -121,7 +121,7 @@ O AWS fornece uma plataforma de criação, hospedagem e manejo de IoT _things_, 
 - Clique em `AWS Account`, na parte superior da tela;
 - Clique no botão `AWS Educate Starter Account` para acessar o _Workbench_ Vocareum;
 >A tela do _Workbench_ Vocareum será visitada mais tarde para obtenção de suas credenciais, no botão `Account Details`. 
-- Clique em `AWS Console` para acessar a página principal do ambiente de desenvolvimento do AWS;
+- Clique em `AWS Console` para acessar a página principal do ambiente de desenvolvimento do AWS, chamada **_AWS Management Console_** ou **Console de gerenciamento da AWS**;
 - No menu `Services`, na parte superior, procure e selecione `IoT Core`. Alternativamente faça a busca na barra de pesquisa ao lado.
 
 O processo de criação de um IoT _thing_ para este projeto não possui pontos problemáticos, pois embora possa ser customizável, não há nenhum desvio de uma criação padrão. [Este tutorial sobre MQTT e AWS IoT Core](https://aws.amazon.com/pt/premiumsupport/knowledge-center/iot-core-publish-mqtt-messages-python/) fornece um ótimo passo-a-passo. Devem ser vistas as etapas **Create an AWS IoT Core policy**, **Create an AWS IoT thing** e **Copy the AWS IoT Core endpoint URL**.
@@ -514,10 +514,9 @@ Continue os testes para cada comando criado, para verificar o funcionamento comp
 	- IoT _thing Endpoint_ errado;
 	- Pasta `certificates` e respectivos arquivos não incluídos corretamente;
 	- Pasta `AWSIoTPythonSDK` e respectivos arquivos não incluídos corretamente;
-	
 	<p align="center">
     <img width="100%" height="100%" src="imagens/imagem_21_Erros03.jpg">
-	</p>
+</p>
 
 - **Alexa responde corretamente mas ferramenta de teste MQTT não apresenta o pacote**: a comunicação entre a _skill_ Alexa e a função Lambda acontece sem problemas e o arquivo `lambda_function.py` possui endereço de IoT _thing Endpoint_ válido, caso contrário o problema seria do caso anterior. Tenha certeza de que o _Endpoint_ é referente a um IoT _thing_ cadastrado na conta AWS do desenvolvedor. Se o cliente de teste MQTT ainda não apresenta o recebimento do pacote enviado pela função Lambda, verifique se este está inscrito no tópico correto, com nome igual ao `iotTopic` no arquivo `.PY` da função.
 
@@ -544,17 +543,27 @@ Por não ser uma ferramenta trivial ou de entendimento rápido, é recomendado l
 - [The Robotics Back-End - What is ROS?](https://roboticsbackend.com/what-is-ros/#What_is_ROS)
 - [AWS Open Source Blog - The Open Source Robot Operating System (ROS) and AWS RoboMaker](https://aws.amazon.com/pt/blogs/opensource/open-source-robot-operating-system-ros-aws-robomaker/)
 
-
-
 ### Ambiente de desenvolvimento
 
+A criação de um ambiente de desenvolvimento no AWS RoboMaker utiliza recursos de hospedagem e _setup_ de VM em nuvem, mas este processo é automatizado e não oferece contratempos. Deve se iniciar pela acesso ao `AWS RoboMaker` por meio do _AWS Management Console_. Após isso escolha a opção `Ambientes de desenvolvimento`, dentro de `Desenvolvimento` no menu à esquerda. Clique em `Criar ambiente de desenvolvimento`.
 
+<p align="center">
+	<img width="100%" height="100%" src="imagens/imagem_22_DevEnv01.jpg">
+</p>
 
+Conforme a figura a seguir, defina os campos:
+- **Nome**: preencha com um nome para a máquina virtual. É recomendável utilizar um nome de fácil distinção, mas este não será utilizado em nenhum documento;
+- **Distribuição do ROS pré-instalada**: escolha `ROS - Melodic`, para acompanhar este tutorial e os demais utilizados pelo autor;
+- **Tipo de instância**: escolha `t2.micro`. Trata-se das configurações de memória RAM e CPU da máquina virtual. É escolhida a opção mais básica para adequar-se ao caráter gratuito para estudantes;
+- **VPC e Subredes**: mantenha as opções dadas por padrão pelo console.
 
+Clique em `Criar`.
 
+<p align="center">
+	<img width="100%" height="100%" src="imagens/imagem_23_DevEnv02.jpg">
+</p>
 
+O ambiente de desenvolvimento será aberto automaticamente e carregado em poucos minutos, com um terminal da VM acessível na parte de baixo da tela e um sistema de arquivos vazio.
 
-
-
-
+### Código de controle do robô
 
