@@ -23,7 +23,7 @@
 - [Criação de função no AWS Lambda](#criação-de-função-no-aws-lambda)
 - [Teste de conectividade entre componentes em nuvem](#teste-de-conectividade-entre-componentes-em-nuvem)
 - [Falhas frequentes - _Troubleshooting_](#falhas-frequentes---troubleshooting)
-- [Exploração do ambiente AWS RoboMaker e simulação do robô](#exploração-do-ambiente-aws-robomaker-e-simulação-do-robô)
+- [Exploração do ambiente AWS RoboMaker e código de controle do robô](#exploração-do-ambiente-aws-robomaker-e-código-de-controle-do-robô)
 
 ## Introdução
 
@@ -520,7 +520,7 @@ Continue os testes para cada comando criado, para verificar o funcionamento comp
 
 - **Alexa responde corretamente mas ferramenta de teste MQTT não apresenta o pacote**: a comunicação entre a _skill_ Alexa e a função Lambda acontece sem problemas e o arquivo `lambda_function.py` possui endereço de IoT _thing Endpoint_ válido, caso contrário o problema seria do caso anterior. Tenha certeza de que o _Endpoint_ é referente a um IoT _thing_ cadastrado na conta AWS do desenvolvedor. Se o cliente de teste MQTT ainda não apresenta o recebimento do pacote enviado pela função Lambda, verifique se este está inscrito no tópico correto, com nome igual ao `iotTopic` no arquivo `.PY` da função.
 
-## Exploração do ambiente AWS RoboMaker e simulação do robô
+## Exploração do ambiente AWS RoboMaker e código de controle do robô
 
 Um dos mais potentes instrumentos do conglomerado AWS para este projeto é a plataforma AWS RoboMaker. Refere-se a um serviço de elaboração e controle de aplicações robóticas, com suporte para simulação e implementação em larga escala. Seu uso facilita o processo de criação de um robô por fornecer ferramentas prontas e adequadas à situação, poupando trabalho em fases problemáticas, desviando a carga computacional da máquina do desenvolvedor e agrupando tarefas relacionadas a diferentes etapas do desenvolvimento.
 
@@ -567,3 +567,115 @@ O ambiente de desenvolvimento será aberto automaticamente e carregado em poucos
 
 ### Código de controle do robô
 
+O funcionamento de uma aplicação robótica em ROS se dá por "_packages_", o que facilita constituir partes diferentes do controle do mesmo robô com segurança e intercomunicação. Estes pacotes possuem formatos e documentos definidos, portanto por simplicidade e para evitar erros utiliza-se como base o exemplo `Hello World` fornecido. No ambiente de desenvolvimento aberto, busque o menu superior, escolha `Resources`, `Download Samples` e clique em `Hello World`. O sistema de arquivos do exemplo será baixado.
+
+<p align="center">
+	<img width="100%" height="100%" src="imagens/imagem_24_DevEnv03.jpg">
+</p>
+
+Dentro deste diretório estão as aplicações robótica e de simulação, nas pastas `robot_ws` e `simulation_ws` respectivamente. Devem ser criados e adaptados arquivos na primeira, mas a segunda não será alterada pois será utilizado o mundo "vazio" dado por padrão. 
+
+O principal arquivo a se abordar é o algoritmo de controle do robô. O arquivo `Python` a ser executado pelo ROS é denominado um "nó" (_node_), encontrado na pasta `robot_ws/src/hello_world_robot/nodes`. O exemplo fornece um código genérico que faz o robô girar em torno do próprio eixo vertical, com o arquivo `rotate`.
+
+> É possível que este arquivo surja com a extensão `.py` em seu nome.
+
+Embora o algoritmo de controle possa ser desenvolvido por cima do arquivo anteriormente citado, é proveitoso criar um novo. Clique com o botão direito sobre a pasta `robot_ws/src/hello_world_robot/nodes`, escolha `New File` e determine um nome - neste projeto utilizou-se o nome `listener`. 
+
+O conteúdo do arquivo é exibido na pasta [AWS RoboMaker](AWS%20RoboMaker/). Este código foi desenvolvido a partir das recomendações [deste tutorial](https://aws.amazon.com/pt/blogs/robotics/build-alexa-controlled-robot/), com as devidas adequações ao uso deste projeto.
+
+<p align="center">
+	<img width="100%" height="100%" src="imagens/imagem_25_DevEnv04.jpg">
+</p>
+
+ São destacáveis os seguintes pontos:
+- `iotThingEndpoint`, `privateKeyPath` e `certificatePath` devem ser corrigidos em função do projeto do desenvolvedor da mesma forma que a função Lambda;
+- O movimento do robô é comandado com uso das funções `Twist`. Esta aplicação robótica descreve o uso de um robô chamado Turtlebot 3 na simulação, que conta com um componente à parte para acionar os motores. Esta biblioteca é responsável por fazer uma abstração de _hardware_, de forma que não seja necessário qualquer tipo de contato com pinagem ou PWM nesta etapa.
+- O tratamento da mensagem MQTT recebida se dá na função `customCallback`. É feita uma checagem sobre o conteúdo do pacote e em função disso é dada uma instrução de movimento. Abaixo segue o exemplo para o comando de voz para movimento limitado à frente (`MoveForwardIntent`), caracterizado pelo início e término do deslocamento linear no eixo _X_ da carcaça.
+
+```Python
+if command == "forward":
+	twist = Twist()
+	twist.linear.x = 1
+	cmd_pub.publish(twist)
+	time.sleep(1)
+	twist.linear.x = 0
+	cmd_pub.publish(twist)
+```
+
+### Arquivos auxiliares
+
+Assim como na função Lambda, é necessário adicionar ao sistema a pasta de certificados. Paralela à `robot_ws/src/hello_world_robot/nodes`, crie no diretório `robot_ws/src/hello_world_robot` uma pasta chamada `certificates`, clicando nesta com o botão direito e escolhendo `New folder`. Copie/mova os arquivos de certificado salvos no seu computador a essa pasta no navegador.
+
+Cumprindo o formato de _packages_, o nó `listener` requer um segundo arquivo para ser executado, chamado _Launch file_. Este deve ser criado na pasta `robot_ws/src/hello_world_robot/launch` com o nome `listener.launch`. Insira neste arquivo o código a seguir (também visto na pasta [AWS RoboMaker](AWS%20RoboMaker/)).
+```XML
+<launch>
+    <!-- 
+       Using simulation time means nodes initialized after this
+       will not use the system clock for its ROS clock and 
+       instead wait for simulation ticks. 
+
+       See http://wiki.ros.org/Clock
+
+       Note: set to false for deploying to a real robot.
+  -->
+  <arg name="use_sim_time" default="true"/>
+  <param name="use_sim_time" value="$(arg use_sim_time)"/>
+
+<!-- Start MQTT listener on launch -->
+  <node name="listener" pkg="hello_world_robot" type="listener" output="screen">
+            <env name="CERTIFICATES" value="$(find hello_world_robot)/certificates/" />
+  </node>
+</launch>
+```
+> Note que a variável `type="listener"` informa o nome do arquivo portador do código de controle, `listener`. Adeque os dados no caso de um nome diferente ou a presença da extensão `.py`. 
+
+Outros arquivos padrões da aplicação robótica devem ser alterados para garantir o correto funcionamento do _package_, sendo eles `package.xml`, `CmakeLists.txt` e `ADICIONAR`.
+
+Os dois primeiros são encontrados na pasta `robot_ws/src/hello_world_robot`. O arquivo `package.xml` necessita apenas da inclusão de uma linha, referente à dependência da biblioteca `AWSIoTPythonSDK`, vista a seguir. Esta deve ser colada junto dos outros comandos `<depend>`. Optou-se por colocá-la logo abaixo da dependência `rospy`.
+
+```XML
+<depend>awsiotpythonsdk-pip</depend>
+```
+
+O arquivo `CMakeLists.txt` requer a adição de dois dados na seção `# Install`, nas duas primeiras chamadas. A seguir está a escrita completa das duas funções adaptadas, a se substituir no código. Novamente o nome do arquivo `listener` mostra-se em `nodes/listener` e deve ser adequado no caso de variações.
+
+```Makefile
+################################################################################
+# Install
+################################################################################
+
+catkin_install_python(PROGRAMS
+	nodes/rotate.py
+	nodes/listener		# Adicione essa linha
+	DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(DIRECTORY launch certificates		# Adicione a palavra `certificates` após `launch`
+	DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
+```
+
+Por último deve ser criado um arquivo para a devida importação da biblioteca AWSIoTPythonSDK ao ROS. Este passo foi dado com o auxílio do guia [Documentation on common colcon bundle scenarios](https://github.com/colcon/colcon-bundle/issues/121). Realize os seguintes passos:
+- Abra um novo terminal;
+- Digite os seguintes comandos:
+	```
+	$ cd /etc/ros/rosdep/sources.list.d/
+	$ sudo touch 21-aws-iot-pip.yaml
+	$ sudo vi 21-aws-iot-pip.yaml
+	```
+	- Será criado o arquivo `21-aws-iot-pip.yaml` na pasta de fontes do ROS e aberto com o editor `vi`. O terminal agora estará em modo de edição de texto.
+- Clique `a` para entrar em modo de escrita;
+- Copie o código a seguir e cole no editor de texto:
+	```yaml
+	awsiotpythonsdk-pip:
+        ubuntu:
+                pip:
+                        packages: [AWSIoTPythonSDK]
+	```
+	>Atente-se à indentação de 1 _tab_ a mais a cada linha, a cópia/cola de texto no editor pode desformatá-lo.
+- Clique `Esc` para sair do modo escrita;
+- Digite `:wq!` e clique `Enter` para salvar o arquivo e sair do editor de texto `vi`.
+
+## Simulação do robô no AWS RoboMaker
+
+A partir deste ponto todos os arquivos estão corretamente ajustados para a simulação. Antes de se realizar a simulação com dispositivo gráfico e todo o processamento de questões físicas, o que demanda certo tempo, é possível verificar o funcionamento da aplicação robótica e sua conectividade com as etapas anteriores.
