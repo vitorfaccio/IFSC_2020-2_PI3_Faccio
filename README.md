@@ -24,6 +24,7 @@
 - [Teste de conectividade entre componentes em nuvem](#teste-de-conectividade-entre-componentes-em-nuvem)
 - [Falhas frequentes - _Troubleshooting_](#falhas-frequentes---troubleshooting)
 - [Exploração do ambiente AWS RoboMaker e código de controle do robô](#exploração-do-ambiente-aws-robomaker-e-código-de-controle-do-robô)
+- [Simulação do robô no AWS RoboMaker](#simulação-do-robô-no-aws-robomaker)
 
 ## Introdução
 
