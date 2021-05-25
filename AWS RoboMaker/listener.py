@@ -1,0 +1,133 @@
+#!/usr/bin/env python
+import rospy
+import logging
+import time
+import os
+from geometry_msgs.msg import Twist
+from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
+
+# Configure logging
+logger = logging.getLogger("AWSIoTPythonSDK.core")
+logger.setLevel(logging.WARN)
+
+# Parameters for AWS IoT MQTT Client.
+iotThingEndpoint = "URL_ENDPOINT" #  Endpoint do Broker criado na primeira etapa.
+iotThingPort = 8883
+certificatePath = os.environ["CERTIFICATES"]
+
+rootCAPath = certificatePath + "root.pem" # localizaçao do certificado Root - adapte se o nome do arquivo for diferente
+privateKeyPath = certificatePath + "XXXX-private.pem.key" # localizaçao da chave privada -- certificatePath +  "...-private.pem.key"
+certificatePath = certificatePath + "XXXX-certificate.pem.crt" # localizaçao do certificado -- certificatePath + "...-certificate.pem.crt"
+
+iotTopic = "PI3Robot-Topic01"
+
+# Init AWSIoTMQTTClient
+skillIoTMQTTClient = AWSIoTMQTTClient("PI3Robot-Subscriber01")
+skillIoTMQTTClient.configureEndpoint(iotThingEndpoint,iotThingPort)
+skillIoTMQTTClient.configureCredentials(rootCAPath, privateKeyPath, certificatePath)
+skillIoTMQTTClient.connect()
+
+DONE = False
+
+# Initialize the node
+rospy.init_node('listener', anonymous=True)
+
+cmd_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
+rospy.loginfo("Roslaunch inicializado.")
+
+# Custom MQTT message callback
+def customCallback(client, userdata, message):
+    global DONE
+    rospy.loginfo("Received payload!")
+    rospy.loginfo(message.topic)
+    rospy.loginfo(message.payload)
+    
+    command = message.payload
+    rospy.loginfo("Processing command: " + command)
+    
+    # Execute command
+    
+    ##################################
+    ### Limited Movement Functions ###
+    
+    if command == "forward":
+        twist = Twist()
+        twist.linear.x = 1
+        cmd_pub.publish(twist)
+        time.sleep(1)
+        twist.linear.x = 0
+        cmd_pub.publish(twist)
+        
+        
+        
+    elif command == "backward":
+        twist = Twist()
+        twist.linear.x = -1
+        cmd_pub.publish(twist)
+        time.sleep(1)
+        twist.linear.x = 0
+        cmd_pub.publish(twist)
+        
+        
+        
+    elif command == "turnleft":
+        twist = Twist()
+        twist.angular.z = 1.5
+        cmd_pub.publish(twist)
+        time.sleep(1)
+        twist.angular.z = 0
+        cmd_pub.publish(twist)
+        
+        
+        
+    elif command == "turnright":
+        twist = Twist()
+        twist.angular.z = -1.5
+        cmd_pub.publish(twist)
+        time.sleep(1)
+        twist.angular.z = 0
+        cmd_pub.publish(twist)
+        
+    ##################################
+    ### Limited Movement Functions ###
+        
+    elif command == "forwardpermanent":
+        twist = Twist()
+        twist.linear.x = 1
+        cmd_pub.publish(twist)
+    
+    elif command == "backwardpermanent":
+        twist = Twist()
+        twist.linear.x = -1
+        cmd_pub.publish(twist)
+        
+    elif command == "turnleftpermanent":
+        twist = Twist()
+        twist.angular.z = 1
+        cmd_pub.publish(twist)    
+        
+    elif command == "turnrightpermanent":
+        twist = Twist()
+        twist.angular.z = -1
+        cmd_pub.publish(twist)
+        
+    elif command == "stop":
+        twist = Twist()
+        twist.angular.z = 0
+        twist.linear.x = 0
+        cmd_pub.publish(twist)
+        
+    else:
+        DONE = True
+
+# Subscribe to topics
+skillIoTMQTTClient.subscribe(iotTopic, 1, customCallback)
+
+time.sleep(2)
+
+while True:
+    time.sleep(1)
+    if DONE:
+        exit(0)
+
+skillIoTMQTTClient.unsubscribe(iotTopic)

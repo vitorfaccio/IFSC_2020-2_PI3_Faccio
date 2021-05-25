@@ -1,0 +1,18 @@
+<launch>
+    <!-- 
+       Using simulation time means nodes initialized after this
+       will not use the system clock for its ROS clock and 
+       instead wait for simulation ticks. 
+
+       See http://wiki.ros.org/Clock
+
+       Note: set to false for deploying to a real robot.
+  -->
+  <arg name="use_sim_time" default="true"/>
+  <param name="use_sim_time" value="$(arg use_sim_time)"/>
+
+<!-- Start MQTT listener on launch -->
+  <node name="listener" pkg="hello_world_robot" type="listener" output="screen">
+            <env name="CERTIFICATES" value="$(find hello_world_robot)/certificates/" />
+  </node>
+</launch>
