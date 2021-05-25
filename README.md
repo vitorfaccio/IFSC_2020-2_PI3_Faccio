@@ -630,7 +630,7 @@ Cumprindo o formato de _packages_, o nó `listener` requer um segundo arquivo pa
 ```
 > Note que a variável `type="listener"` informa o nome do arquivo portador do código de controle, `listener`. Adeque os dados no caso de um nome diferente ou a presença da extensão `.py`. 
 
-Outros arquivos padrões da aplicação robótica devem ser alterados para garantir o correto funcionamento do _package_, sendo eles `package.xml`, `CmakeLists.txt` e `ADICIONAR`.
+Outros arquivos padrões da aplicação robótica devem ser alterados para garantir o correto funcionamento do _package_, sendo eles `package.xml`, `CMakeLists.txt` e `21-aws-iot-pip.yaml`.
 
 Os dois primeiros são encontrados na pasta `robot_ws/src/hello_world_robot`. O arquivo `package.xml` necessita apenas da inclusão de uma linha, referente à dependência da biblioteca `AWSIoTPythonSDK`, vista a seguir. Esta deve ser colada junto dos outros comandos `<depend>`. Optou-se por colocá-la logo abaixo da dependência `rospy`.
 
