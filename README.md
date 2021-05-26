@@ -605,7 +605,7 @@ if command == "forward":
 
 ### Arquivos auxiliares
 
-Assim como na função Lambda, é necessário adicionar ao sistema a pasta de certificados. Paralela à `robot_ws/src/hello_world_robot/nodes`, crie no diretório `robot_ws/src/hello_world_robot` uma pasta chamada `certificates`, clicando nesta com o botão direito e escolhendo `New folder`. Copie/mova os arquivos de certificado salvos no seu computador a essa pasta no navegador.
+Assim como na função Lambda, é necessário adicionar ao sistema a pasta de certificados. Paralela à `robot_ws/src/hello_world_robot/nodes`, crie no diretório `robot_ws/src/hello_world_robot` uma pasta chamada `certificates`, clicando nesta com o botão direito, escolhendo `New folder` e alterando o nome. Copie/mova os arquivos de certificado salvos no seu computador a essa pasta no navegador.
 
 Cumprindo o formato de _packages_, o nó `listener` requer um segundo arquivo para ser executado, chamado _Launch file_. Este deve ser criado na pasta `robot_ws/src/hello_world_robot/launch` com o nome `listener.launch`. Insira neste arquivo o código a seguir (também visto na pasta [AWS RoboMaker](AWS%20RoboMaker/)).
 ```XML
@@ -666,17 +666,41 @@ Por último deve ser criado um arquivo para a devida importação da biblioteca 
 	```
 	- Será criado o arquivo `21-aws-iot-pip.yaml` na pasta de fontes do ROS e aberto com o editor `vi`. O terminal agora estará em modo de edição de texto.
 - Clique `a` para entrar em modo de escrita;
-- Copie o código a seguir e cole no editor de texto:
+- Insira o código a seguir no editor de texto:
 	```yaml
 	awsiotpythonsdk-pip:
         ubuntu:
                 pip:
                         packages: [AWSIoTPythonSDK]
 	```
-	>Atente-se à indentação de 1 _tab_ a mais a cada linha, a cópia/cola de texto no editor pode desformatá-lo.
+	>Atente-se à indentação de 1 _tab_ a mais a cada linha, a cópia/cola de texto no editor pode desformatá-lo.	
 - Clique `Esc` para sair do modo escrita;
-- Digite `:wq!` e clique `Enter` para salvar o arquivo e sair do editor de texto `vi`.
+- Digite `:wq!` e clique `Enter` para salvar o arquivo e sair do editor de texto `vi`;
+- Execute o seguinte comando para retornar ao diretório inicial do terminal:
+	```
+	$ cd -
+	```
 
 ## Simulação do robô no AWS RoboMaker
 
 A partir deste ponto todos os arquivos estão corretamente ajustados para a simulação. Antes de se realizar a simulação com dispositivo gráfico e todo o processamento de questões físicas, o que demanda certo tempo, é possível verificar o funcionamento da aplicação robótica e sua conectividade com as etapas anteriores.
+
+Comandos (novo terminal):
+```
+$ cd aws-robomaker-sample-application-helloworld/simulation_ws/
+$ rosdep update
+$ rosdep install --from-paths src --ignore-src -r -y
+$ colcon build
+$ colcon bundle
+
+$ cd ../robot_ws/
+$ rosdep update
+$ rosdep install --from-paths src --ignore-src -r -y
+$ colcon build
+$ colcon bundle
+```
+
+```
+$ source install/setup.sh
+$ roslaunch hello_world_robot listener.launch
+```
