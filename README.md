@@ -80,7 +80,11 @@ Este pode ser o primeiro contato do leitor com robótica, Alexa e plataforma AWS
     -   _RoboMaker Course 1b: Getting Started with AWS_;
     -   _AWS RoboMaker Course 2: ROS2 and ROS_;
     -   _IoT Badge_;
-    -   _Alexa Badge_.
+    -   _Alexa Badge_;
+- [Build an Alexa controlled robot with AWS RoboMaker](https://aws.amazon.com/pt/blogs/robotics/build-alexa-controlled-robot/)
+- [AWS - Creating a New Robotic Application](https://docs.aws.amazon.com/robomaker/latest/dg/application-create-new.html)
+- [YouTube - Build Your Robot | Getting Started with Robots & AWS RoboMaker](https://www.youtube.com/watch?v=4R4_GCiayD8&ab_channel=AmazonWebServicesAmazonWebServices)
+- [YouTube - Build a Robot Application with AWS RoboMaker - AWS Online Tech Talks](https://www.youtube.com/watch?v=b7wzhSo4F_M&ab_channel=AWSOnlineTechTalks)
 
 ## Núcleos de trabalho
 - **Primeira etapa**:
@@ -553,7 +557,7 @@ A criação de um ambiente de desenvolvimento no AWS RoboMaker utiliza recursos 
 </p>
 
 Conforme a figura a seguir, defina os campos:
-- **Nome**: preencha com um nome para a máquina virtual. É recomendável utilizar um nome de fácil distinção, mas este não será utilizado em nenhum documento;
+- **Nome**: preencha com um nome para a máquina virtual. É recomendável utilizar um nome de fácil distinção, mas este não será utilizado em nenhum documento. Este projeto utilizou o nome `dev-env-01`;
 - **Distribuição do ROS pré-instalada**: escolha `ROS - Melodic`, para acompanhar este tutorial e os demais utilizados pelo autor;
 - **Tipo de instância**: escolha `t2.micro`. Trata-se das configurações de memória RAM e CPU da máquina virtual. É escolhida a opção mais básica para adequar-se ao caráter gratuito para estudantes;
 - **VPC e Subredes**: mantenha as opções dadas por padrão pelo console.
@@ -568,7 +572,10 @@ O ambiente de desenvolvimento será aberto automaticamente e carregado em poucos
 
 ### Código de controle do robô
 
-O funcionamento de uma aplicação robótica em ROS se dá por "_packages_", o que facilita constituir partes diferentes do controle do mesmo robô com segurança e intercomunicação. Estes pacotes possuem formatos e documentos definidos, portanto por simplicidade e para evitar erros utiliza-se como base o exemplo `Hello World` fornecido. No ambiente de desenvolvimento aberto, busque o menu superior, escolha `Resources`, `Download Samples` e clique em `Hello World`. O sistema de arquivos do exemplo será baixado.
+O funcionamento de uma aplicação robótica em ROS se dá por "_packages_", o que facilita constituir partes diferentes do controle do mesmo equipamento com segurança e intercomunicação. Estes pacotes possuem formatos e documentos definidos, portanto por simplicidade e para evitar erros utiliza-se como base um exemplo `Hello World`. 
+
+Com o ambiente de desenvolvimento aberto, busque o menu superior, escolha `Resources`, `Download Samples` e clique em `Hello World`. O sistema de arquivos do exemplo será baixado e colocado dentro de uma pasta com o nome da máquina virtual, `dev-env-01`. Este conjunto será baixado com nome `aws-robomaker-sample-application-helloworld`.
+> Observe os nomes dessas pastas e adeque-se no caso de divergências com seu projeto.
 
 <p align="center">
 	<img width="100%" height="100%" src="imagens/imagem_24_DevEnv03.jpg">
@@ -605,7 +612,9 @@ if command == "forward":
 
 ### Arquivos auxiliares
 
-Assim como na função Lambda, é necessário adicionar ao sistema a pasta de certificados. Paralela à `robot_ws/src/hello_world_robot/nodes`, crie no diretório `robot_ws/src/hello_world_robot` uma pasta chamada `certificates`, clicando nesta com o botão direito, escolhendo `New folder` e alterando o nome. Copie/mova os arquivos de certificado salvos no seu computador a essa pasta no navegador.
+O primeiro elemento a se adicionar no ambiente de desenvolvimento é a pasta `deps`, disponível na pasta [AWS RoboMaker](AWS%20RoboMaker/). Esta deve ser baixada e colocada no diretório `robot_ws/src`
+
+Assim como na função Lambda, é necessário adicionar ao sistema a pasta de certificados. Paralela à pasta `nodes`, crie no diretório `robot_ws/src/hello_world_robot` uma pasta chamada `certificates`, clicando nesta com o botão direito, escolhendo `New folder` e alterando o nome. Copie/mova os arquivos de certificado salvos no seu computador a essa pasta no navegador.
 
 Cumprindo o formato de _packages_, o nó `listener` requer um segundo arquivo para ser executado, chamado _Launch file_. Este deve ser criado na pasta `robot_ws/src/hello_world_robot/launch` com o nome `listener.launch`. Insira neste arquivo o código a seguir (também visto na pasta [AWS RoboMaker](AWS%20RoboMaker/)).
 ```XML
@@ -622,8 +631,12 @@ Cumprindo o formato de _packages_, o nó `listener` requer um segundo arquivo pa
   <arg name="use_sim_time" default="true"/>
   <param name="use_sim_time" value="$(arg use_sim_time)"/>
 
-<!-- Start MQTT listener on launch -->
-  <node name="listener" pkg="hello_world_robot" type="listener" output="screen">
+  <!-- Optional environment variable, default is "waffle_pi". Note that "burger" does not have a camera -->
+  <arg name="model" default="$(optenv TURTLEBOT3_MODEL waffle_pi)" doc="model type [burger, waffle, waffle_pi]"/>
+  <param name="robot_description" command="$(find xacro)/xacro --inorder $(find turtlebot3_description_reduced_mesh)/urdf/turtlebot3_$(arg model).urdf.xacro" />
+
+  <!-- Start MQTT listener on launch -->
+  <node pkg="hello_world_robot" name="listener" type="listener" output="screen">
             <env name="CERTIFICATES" value="$(find hello_world_robot)/certificates/" />
   </node>
 </launch>
@@ -656,6 +669,10 @@ install(DIRECTORY launch certificates		# Adicione a palavra `certificates` após
 )
 ```
 
+<p align="center">
+	<img width="100%" height="100%" src="imagens/imagem_26_DevEnv05.jpg">
+</p>
+
 Por último deve ser criado um arquivo para a devida importação da biblioteca AWSIoTPythonSDK ao ROS. Este passo foi dado com o auxílio do guia [Documentation on common colcon bundle scenarios](https://github.com/colcon/colcon-bundle/issues/121). Realize os seguintes passos:
 - Abra um novo terminal;
 - Digite os seguintes comandos:
@@ -683,9 +700,16 @@ Por último deve ser criado um arquivo para a devida importação da biblioteca 
 
 ## Simulação do robô no AWS RoboMaker
 
-A partir deste ponto todos os arquivos estão corretamente ajustados para a simulação. Antes de se realizar a simulação com dispositivo gráfico e todo o processamento de questões físicas, o que demanda certo tempo, é possível verificar o funcionamento da aplicação robótica e sua conectividade com as etapas anteriores.
+A partir deste ponto todos os arquivos estão corretamente ajustados para a simulação. Antes de se realizar a simulação com dispositivo gráfico e todo o comportamento físico, o que demanda certo tempo, é possível verificar o funcionamento da aplicação robótica e sua conectividade com as etapas anteriores, a fim de se segmentar as possibilidades de erros.
 
-Comandos (novo terminal):
+### Teste de conectividade no terminal da VM
+
+Esta etapa se passa unicamente no terminal do ambiente de desenvolvimento. Será feita a execução da aplicação robótica com uso das ferramentas do ROS, da mesma forma  que será na placa Raspberry Pi. 
+
+Será possível conferir a recepção das requisições MQTT do _broker_ e seu conteúdo. [Este tutorial da AWS](https://www.youtube.com/watch?v=4R4_GCiayD8&ab_channel=AmazonWebServicesAmazonWebServices) mostra a construção de uma aplicação robótica no RoboMaker no formato do `Hello World`, testa no terminal a execução do _node_ `rotate.py` e recebe dados de movimentação, relacionados às funções `Twist`. Esta checagem não será feita por poluir o terminal, sendo mantida apenas a leitura dos pacotes MQTT.
+
+O ROS conta com todas as ferramentas para o `build` da aplicação. A partir de um novo terminal, escreva os seguintes comandos:
+
 ```
 $ cd aws-robomaker-sample-application-helloworld/simulation_ws/
 $ rosdep update
@@ -698,9 +722,63 @@ $ rosdep update
 $ rosdep install --from-paths src --ignore-src -r -y
 $ colcon build
 $ colcon bundle
+$ source install/setup.sh
 ```
 
+O comando a seguir irá executar o `listener`:
+
 ```
-$ source install/setup.sh
 $ roslaunch hello_world_robot listener.launch
 ```
+
+<p align="center">
+	<img width="100%" height="100%" src="imagens/imagem_27_DevEnv06.jpg">
+</p>
+
+Quando a execução for corretamente estabelecida, deverá ser vista na tela a mensagem `[INFO] [...] Roslaunch inicializado`. O _node_ estará esperando o recebimento de pacotes MQTT. 
+
+Abra novamente o ambiente de testes do Alexa Developer Console e envie um dos comandos definidos. A seguir é visto um exemplo do recebimento de mensagem com conteúdo `'forward'`,  em consequência do comando de voz `Alexa, ask robot one to move forward`.
+
+<p align="center">
+	<img width="100%" height="100%" src="imagens/imagem_28_DevEnv07.jpg">
+</p>
+
+Dentro do _node_ está especificado que o encerramento do código se dá pelo recebimento de um pacote `'shutdown'`. Envie o comando `Alexa, ask robot one to shut down` no console para encerrar o teste.
+
+<p align="center">
+	<img width="100%" height="100%" src="imagens/imagem_29_DevEnv08.jpg">
+</p>
+
+>Apesar de os passos dados terem se mostrado efetivos em diversas repetições, esta etapa envolve mais variáveis que não foram abordadas e podem causar erros. Devido a isso não houve consistência de dados para elaborar um _troubleshooting_.
+
+### Criação de _bucket_ no AWS S3 e _upload_ dos arquivos
+
+Para prosseguir à simulação é necessário exportar as aplicações desenvolvidas até agora. Na série de comandos anteriores foi utilizado o comando [colcon bundle](https://github.com/colcon/colcon-bundle), que agrupa os dados de um _workspace_ para que se execute em outra máquina sem variações. Estes conjuntos (_bundles_) devem estar disponíveis ao ambiente de simulação; para isso eles serão salvos em um _bucket_ no AWS S3.
+
+O S3 (_Simple Storage Service_) é uma plataforma de armazenamento de dados em nuvem da AWS, munida de ferramentas de integração com outros serviços. Deve ser criado um _bucket_, que age como uma pasta. 
+
+<p align="center">
+	<img width="100%" height="100%" src="imagens/imagem_30_S301.jpg">
+</p>
+
+- A partir do _AWS Management Console_ procure e acesse o AWS S3;
+- Clique em `Criar bucket`. Selecione as seguintes configurações:
+- **Nome do bucket**: insira um nome, sem espaço ou letras maiúsculas. Neste projeto utilizou-se `pi3robot-bucket-01`;
+- **Região da AWS**: mantenha a opção dada por padrão;
+- **Copiar configurações do bucket existente - *opcional***: não utilize essa ferramenta;
+- **Configurações de bloqueio do acesso público deste bucket**: mantenha selecionada a opção `Bloquear todo o acesso público`;
+- **Versionamento de bucket**: `Desativar`;
+- **Tags(0) -  *opcional***: não utilize essa ferramenta;
+- **Criptografia padrão**: `Desativar`;
+- Clique em `Criar bucket`.
+
+De volta ao ambiente de desenvolvimento do RoboMaker, abra uma nova janela no terminal e execute os seguintes comandos:
+
+```
+$ cd aws-robomaker-sample-application-helloworld/
+$ aws s3 cp robot_ws/bundle/output.tar s3://pi3robot-bucket-01/robot.tar
+$ aws s3 cp simulation_ws/bundle/output.tar s3://pi3robot-bucket-01/simulation.tar
+```
+> Os termos `s3://pi3robot-bucket-01/...` são referentes ao _bucket_ recém-criado. Ajuste os nomes se for necessário.
+
+### Criação de _applications_ e _simulation job_
