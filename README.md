@@ -25,6 +25,7 @@
 - [Falhas frequentes - _Troubleshooting_](#falhas-frequentes---troubleshooting)
 - [Exploração do ambiente AWS RoboMaker e código de controle do robô](#exploração-do-ambiente-aws-robomaker-e-código-de-controle-do-robô)
 - [Simulação do robô no AWS RoboMaker](#simulação-do-robô-no-aws-robomaker)
+- [**SEGUNDA ETAPA**](#segunda-etapa)
 
 ## Introdução
 
@@ -612,7 +613,7 @@ if command == "forward":
 
 ### Arquivos auxiliares
 
-O primeiro elemento a se adicionar no ambiente de desenvolvimento é a pasta `deps`, disponível na pasta [AWS RoboMaker](AWS%20RoboMaker/). Esta deve ser baixada e colocada no diretório `robot_ws/src`
+O primeiro elemento a se adicionar no ambiente de desenvolvimento é a pasta `deps`, disponível na pasta [AWS RoboMaker](AWS%20RoboMaker/). Esta deve ser baixada e colocada nos diretórios `robot_ws/src` e `simulation_ws/src`.
 
 Assim como na função Lambda, é necessário adicionar ao sistema a pasta de certificados. Paralela à pasta `nodes`, crie no diretório `robot_ws/src/hello_world_robot` uma pasta chamada `certificates`, clicando nesta com o botão direito, escolhendo `New folder` e alterando o nome. Copie/mova os arquivos de certificado salvos no seu computador a essa pasta no navegador.
 
@@ -779,6 +780,127 @@ $ cd aws-robomaker-sample-application-helloworld/
 $ aws s3 cp robot_ws/bundle/output.tar s3://pi3robot-bucket-01/robot.tar
 $ aws s3 cp simulation_ws/bundle/output.tar s3://pi3robot-bucket-01/simulation.tar
 ```
+
+<p align="center">
+	<img width="100%" height="100%" src="imagens/imagem_31_S302.jpg">
+</p>
+
 > Os termos `s3://pi3robot-bucket-01/...` são referentes ao _bucket_ recém-criado. Ajuste os nomes se for necessário.
 
-### Criação de _applications_ e _simulation job_
+### Criação de Aplicativos de Robô e Simulação
+
+A simulação precisa receber de certa forma as aplicações criadas no ambiente de desenvolvimento, cujos _bundles_ foram salvos no AWS S3. No menu esquerdo do console AWS RoboMaker encontre as opções **"Aplicativos de robô"** e **"Aplicativos de simulação"**. 
+
+Iniciando pelo aplicativo de robô, clique na opção **"Aplicativos de robô"** e em `Criar um aplicativo de robô`. Insira os seguintes dados:
+
+- `Nome`: um nome para o aplicativo de robô. Neste exemplo foi utilizado `pi3robot_robotapp_01`;
+- `Distribuição do ROS`: a mesma opção da utilizada no ambiente de desenvolvimento, `Melodic`;
+- `Origens`: escolha a opção `Arquivo de origem de X86_64` e clique em `Browse S3`. Navegue pelo seus arquivos no S3, encontre o _bucket_ criado previamente e escolha o arquivo `robot.tar` enviado na seção anterior;
+- Clique em `Criar`.
+
+<p align="center">
+	<img width="100%" height="100%" src="imagens/imagem_32_Sim01.jpg">
+</p>
+
+Novamente no menu esquerdo do console AWS RoboMaker, clique em **"Aplicativos de simulação"** e em `Criar aplicativo de simulação`. Insira os dados:
+
+- `Nome`:  um nome para o aplicativo de simulação. Neste exemplo foi utilizado `pi3robot_simapp_01`;
+- `Distribuição do ROS`: a mesma opção da utilizada no ambiente de desenvolvimento, `Melodic`;
+- `Pacote de software de simulação`: `Gazebo 9`;
+- `Mecanismo de renderização de simulação`: `OGRE 1.x`;
+- `Origens`: em `Arquivo de origem de X86_64` clique em `Browse S3`, procure o _bucket_ deste projeto e escolha o arquivo `simulation.tar`;
+- Clique em `Criar`.
+
+<p align="center">
+	<img width="100%" height="100%" src="imagens/imagem_33_Sim02.jpg">
+</p>
+
+### Criação de Trabalho de Simulação
+
+O trabalho de simulação é a reunião dos componentes do robô e do meio, vistos anteriormente, com o processamento dos dados resultantes e representação gráfica. 
+
+Antes de se criar o trabalho de simulação é preciso ter uma **Função** (_role_) no AWS IAM, que irá permitir o acesso do AWS RoboMaker ao _bucket_ no AWS S3. Este processo é explicado e ensinado no tutorial [Create a Simulation Job](https://docs.aws.amazon.com/robomaker/latest/dg/application-create-simjob.html), na seção **"_Create a Simulation Job Role_"**. Este aborda a criação de um trabalho de simulação por meio da interface de linhas de comando da AWS (_Command Line Interface_ - AWS CLI). Tal sistema não foi optado neste projeto, mas o processo de criação da função no AWS IAM é o mesmo. Para esta função definiu-se ambos os _buckets_ de leitura e de escrita de dados como o `pi3robot-bucket-01`. 
+
+No menu do console AWS RoboMaker, clique em **Trabalhos de simulação** e em `Criar tarefa de simulação`. Este procedimento é dividido em quatro partes. Na primeira, **Configurar simmulação**, escolha os seguintes pontos:
+
+- `Duração da tarefa de simulação`: Esta duração pode ser curta, pois serão testados apenas a conexão do robô simulado com a nuvem e seus movimentos. `10 minutos` são suficientes;
+- `Comportamento com falha`: `Falha`;
+- `Distribuição do ROS`: a mesma dos anteriores, `Melodic`;
+- `Função do IAM`: a função criada na última seção, neste caso denominada `PI3Robot-Role-01`. Note que as _roles_ criadas mais recentemente serão mostradas automaticamente;
+- `Computação`: para evitar a cobrança de fundos da conta de estudante da AWS, escolha o menor valor possível, `1 SU (1 vCPU, 2 GB de memória)`;
+- `Saída da tarefa de simulação`: navegue pelo S3 e marque o _bucket_ do projeto;
+- `Registre todos os tópicos sobre ROS`: não ative;
+- `Redes`:
+	- `VPC`: escolha a opção marcada como `Padrão`;
+	- `Grupos de segurança`: marque a opção `default`;
+	- `Sub-redes`: escolha duas opções da lista. Não foi pesquisado de que forma estas sub-redes afetam a conexão da simulação, portanto optou-se pelas duas primeiras da lista, `us-east-1a` e `us-east-1b`;
+	- `Atribuir IP público`: `Sim`;
+- Clique em `Próximo`.
+
+<p align="center">
+	<img width="100%" height="100%" src="imagens/imagem_34_Sim03.jpg">
+</p>
+
+Agora na etapa **Especificar aplicativo de robô** insira os dados:
+
+- `Aplicativo de robô`:
+	- Nas três caixas maiores, escolha a `Fechar aplicativo existente` [sic];
+	- `Aplicativo de robô`: clique na lista e escolha o aplicativo recém-criado, `pi3robot_robotapp_01`;
+	- `Versão do aplicativo de robô`: `$LATEST`;
+- `Configuração de aplicativo de robô`:
+	- `Nome do pacote de execução`: insira o nome da aplicação robótica desenvolvida na VM, `hello_world_robot`;
+	- `Arquivo de lançamento`: trata-se do arquivo `.launch` criado, neste caso `listener.launch`;
+	- `Executar com sessão de streaming`: não ative;
+- Clique em `Próximo`.
+
+<p align="center">
+	<img width="100%" height="100%" src="imagens/imagem_35_Sim04.jpg">
+</p>
+
+Por fim, na etapa **Especificar aplicativo de simulação** continue:
+
+- `Aplicativo de simulação`:
+	- Nas três caixas maiores, escolha a `Fechar aplicativo existente` [sic];
+	- `Aplicativo de robô`: clique na lista e escolha o aplicativo recém-criado, `pi3robot_simapp_01`;
+	- `Versão do aplicativo de simulação`: `$LATEST`;
+- `Configuração de aplicativo de simulação`:
+	- `Nome do pacote de execução`: insira o nome da aplicação de simulação desenvolvida na VM, `hello_world_simulation`;
+	- `Arquivo de lançamento`: como já informado, será utilizado uma aplicação de mundo vazio, com nome `empty_world.launch`;
+	- `Executar com sessão de streaming`: não ative;
+- Clique em `Próximo`.
+
+<p align="center">
+	<img width="100%" height="100%" src="imagens/imagem_36_Sim05.jpg">
+</p>
+
+Na seção **Analisar e criar tarefa de simulação** confira todos os dados expostos e clique em `Criar`. 
+
+A partir deste ponto a tarefa de simulação começará a ser processada. Na aba **Detalhes** observe o indicador **Status**, que iniciará como `Preparando`. Quando este se alterar para `Em execução` a simulação estará disponível pelo tempo estabelecido anteriormente. Várias ferramentas estão disponíveis para o desenvolvedor, para análise de dados de sensores ou acesso ao terminal da máquina. Encontre a opção `GZClient` e clique em `Connect` para abrir o _client_ gráfico Gazebo 9.
+
+<p align="center">
+	<img width="100%" height="100%" src="imagens/imagem_37_Sim06.jpg">
+</p>
+
+A simulação deverá iniciar com o robô parado e posicionado na origem dos três eixos cartesianos.
+
+<p align="center">
+	<img width="100%" height="100%" src="imagens/imagem_38_Sim07.jpg">
+</p>
+
+Na área de testes do Alexa Developer Console envie comandos para o robô e observe seu movimento. Espera-se que este reaja em tempo real. Na figura a seguir o robô é visto após serem comandados os movimentos limitados para frente e rotação anti-horária, nesta ordem.
+
+<p align="center">
+	<img width="100%" height="100%" src="imagens/imagem_39_Sim08.jpg">
+</p>
+
+As setas em vermelho explicitam o movimento obtido.
+
+<p align="center">
+	<img width="100%" height="100%" src="imagens/imagem_40_Sim09.jpg">
+</p>
+
+Como último ponto na simulação é possível verificar o envio de comando `shutdown`. Como esperado, o robô interrompe o funcionamento e não reage mais aos comandos. 
+
+# Segunda etapa
+
+
