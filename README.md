@@ -903,4 +903,12 @@ Como último ponto na simulação é possível verificar o envio de comando `shu
 
 # Segunda etapa
 
+A segunda etapa deste projeto consiste na implementação da aplicação robótica em uma Raspberry Pi 3 B+. A meta é embarcar um sistema operacional com acesso a pinos de saída em uma estrutura robótica, executar um controle equivalente ao do capítulo anterior e atuar sobre os motores elétricos. A figura a seguir esboça o esquema ao redor da placa, que já possui módulos _wi-fi_ e GPIO integrados. Como já citado, a inacessibilidade a muitos recursos materiais e laboratoriais prejudicou o escopo do projeto. Nesta etapa esta situação se mostrou delicada na questão da carcaça do robô e seus componentes, os dois motores elétricos e o _driver_ de ponte H para acionamento, os quais não puderam ser utilizados.
+
+<p align="center">
+	<img width="100%" height="100%" src="imagens/imagem_41_Etapa2.jpg">
+</p>
+
+
+
 
